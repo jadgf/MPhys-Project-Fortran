@@ -3,17 +3,17 @@ Program Wannier_band_structure
 !--------to be midified by the usere
     character(len=80):: prefix="BiTeI"
     integer,parameter::nkpath=3,np=100,meshres=1000
-    real*8,parameter::ef= 4.18903772,ikmax=0.1
+    real*8,parameter::ef= 4.18903772,ikmax=0.1, tolerance = 0.05
 !------------------------------------------------------
-    real*8 kz,kmesh(3,meshres)
+    real*8 kz,kmesh(3,meshres), CBM
     character(len=30)::klabel(nkpath)
     character(len=80) hamil_file,nnkp,line
     integer*4,parameter::nk=(nkpath-1)*np+1
-    integer*4 i,j,k,nr,i1,i2,nb,lwork,info
+    integer*4 i,j,k,nr,i1,i2,nb,lwork,info,count
     real*8,parameter::third=1d0/3d0!,kz=0d0
     real*8 phase,pi2,jk,a,b
     real*8 klist(3,1:nk),xk(nk),kpath(3,np),avec(3,3),bvec(3,3),ktemp1(3),ktemp2(3),xkl(nkpath),rvec(3)
-    real*8,allocatable:: rvec_data(:,:),ene(:,:),rwork(:)
+    real*8,allocatable:: rvec_data(:,:),ene(:,:),rwork(:),k_ene(:),kpoints(:,:)
     integer*4,allocatable:: ndeg(:)
     complex*16,allocatable:: Hk(:,:),Hamr(:,:,:),work(:)
     complex*16 temp1,temp2
@@ -99,7 +99,10 @@ Program Wannier_band_structure
        call zheev('V','U',nb,Hk,nb,ene(:,k),work,lwork,rwork,info)
        
     enddo
+    CBM = MINVAL(ene(13, :))
 
+    deallocate(Hk,ene,work)
+    allocate(Hk(nb,nb),k_ene(nb))
 !----- Create K-mesh
     do i=1,meshres+1
         do j=1, meshres+1
@@ -110,17 +113,24 @@ Program Wannier_band_structure
     enddo
 
 !----- Perform cartesian fourier transform
-    do j=1,meshres**2
+    do k=1,meshres**2
         HK=(0d0,0d0)
         do i=1,nr
             rvec = rvec_data(1,i) * avec(:,1) + rvec_data(2,i) * avec(:,2) + rvec_data(3,i) * avec(:,3)
-            phase = rvec(1)*kmesh(1,j) + rvec(2)*kmesh(2,j) + rvec(3)*kmesh(3,j)
+            phase = rvec(1)*kmesh(1,k) + rvec(2)*kmesh(2,k) + rvec(3)*kmesh(3,k)
             HK=HK+Hamr(:,:,j)*dcmplx(cos(phase),-sin(phase))/float(ndeg(j))
         enddo
-        call zheev('V','U',nb,Hk,nb,ene(:,k),work,lwork,rwork,info)
+        call zheev('V','U',nb,Hk,nb,k_ene,work,lwork,rwork,info)
+        if((ABS(k_ene(12) - CBM).lt.tolerance).or.(ABS(k_ene(13) - CBM).lt.tolerance)) then
+            count = count + 1
+            allocate(kpoints(3,count))
+            kpoints(:,count) = kmesh(:,k)
+        endif
     enddo
-    deallocate(HK,work)
-    
+
+    do i=1,SIZE(kpoints)
+        print *, kpoints(1,i)
+    enddo
     do i=1,nb
        do k=1,nk
          write(100,'(2(x,f12.6))') xk(k),ene(i,k)
