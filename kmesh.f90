@@ -2,7 +2,7 @@ Program Wannier_band_structure
     Implicit None
 !--------to be midified by the usere
     character(len=80):: prefix="BiTeI"
-    integer,parameter::nkpath=3,np=100,meshres=100
+    integer,parameter::nkpath=3,np=100,meshres=10
     real*8,parameter::ef= 4.18903772,ikmax=0.1, tolerance = 0.05
 !------------------------------------------------------
     real*8 kz, kmesh(3,meshres**2), dx, dy, CBM, m_x, m_y, m_z
@@ -117,8 +117,9 @@ Program Wannier_band_structure
     count=1
     do i=1,meshres ! +1 to include +0.1 point
         do j=1,meshres ! +1 to include +0.1 point
-            kmesh(1, count) = -ikmax + dx * (i - 1)
-            kmesh(2, count) = -ikmax + dy * (j - 1)
+            kmesh(1, count) = -ikmax + (dx * (i - 1))
+            kmesh(2, count) = -ikmax + (dy * (j - 1))
+            print *, kmesh(1,count), kmesh(2,count)
             count = count + 1
         enddo 
     enddo
@@ -133,47 +134,65 @@ Program Wannier_band_structure
             HK=HK+Hamr(:,:,i)*dcmplx(cos(phase),-sin(phase))/float(ndeg(i))
         enddo
         call zheev('V','U',nb,HK,nb,k_ene,work,lwork,rwork,info)
-        print *, k_ene(13)
+
         if((ABS(k_ene(13) - (CBM+0.02)).lt.tolerance).or.(ABS(k_ene(14) - (CBM+0.02)).lt.tolerance)) then
             count = count + 1
-            allocate(kpoints(3,count),kp_eivec(count,nb,nb), m_k_data(3,count))
+            ! allocate(kpoints(3,count),kp_eivec(count,nb,nb), m_k_data(3,count))
+            ! kpoints(:,count) = kmesh(:,k)
+            ! kp_eivec(count,:,:) = Hk(:,:)
+        endif
+    enddo
+    print *, count
+    allocate(kpoints(2,count), kp_eivec(count,nb,nb), m_k_data(3,count))
+
+    count=1
+    do k=1,meshres**2
+        HK=(0d0,0d0)
+        do i=1,nr
+            rvec = rvec_data(1,i) * avec(:,1) + rvec_data(2,i) * avec(:,2) + rvec_data(3,i) * avec(:,3)
+            phase = rvec(1)*kmesh(1,k) + rvec(2)*kmesh(2,k) + rvec(3)*kmesh(3,k)
+            HK=HK+Hamr(:,:,i)*dcmplx(cos(phase),-sin(phase))/float(ndeg(i))
+        enddo
+        call zheev('V','U',nb,HK,nb,k_ene,work,lwork,rwork,info)
+
+        if((ABS(k_ene(13) - (CBM+0.02)).lt.tolerance).or.(ABS(k_ene(14) - (CBM+0.02)).lt.tolerance)) then
             kpoints(:,count) = kmesh(:,k)
             kp_eivec(count,:,:) = Hk(:,:)
+            count = count + 1
         endif
     enddo
 
 !-----Spin projection
-    pauli_x(1, 1) = complex(0.d0, 0.d0); pauli_x(1, 2) = complex(1.d0, 0.d0); pauli_x(2, 1) = complex(1.d0, 0.d0); pauli_x(2, 2) = complex(0.d0, 0.d0)
-    pauli_y(1, 1) = complex(0.d0, 0.d0); pauli_y(1, 2) = complex(0.d0, -1.d0); pauli_y(2, 1) = complex(0.d0, 1.d0); pauli_y(2, 2) = complex(0.d0, 0.d0)
-    pauli_z(1, 1) = complex(1.d0, 0.d0); pauli_z(1, 2) = complex(0.d0, 0.d0); pauli_z(2, 1) = complex(0.d0, 0.d0); pauli_z(2, 2) = complex(-1.d0, 0.d0)
-    do i=1, count
-        do j=1, nb
-            m_x_comp = 0d0
-            m_y_comp = 0d0
-            m_z_comp = 0d0
-            H_col = kp_eivec(i,:,j)
-            do k=1, 9
-                chi_k = reshape([H_col(k), H_col(k+9)], [2, 1])
+    pauli_x(1, 1) = complex(0.d0, 0.d0); pauli_x(1, 2) = complex(1.d0, 0.d0)
+        pauli_x(2, 1) = complex(1.d0, 0.d0); pauli_x(2, 2) = complex(0.d0, 0.d0)
+    pauli_y(1, 1) = complex(0.d0, 0.d0); pauli_y(1, 2) = complex(0.d0, -1.d0)
+        pauli_y(2, 1) = complex(0.d0, 1.d0); pauli_y(2, 2) = complex(0.d0, 0.d0)
+    pauli_z(1, 1) = complex(1.d0, 0.d0); pauli_z(1, 2) = complex(0.d0, 0.d0)
+        pauli_z(2, 1) = complex(0.d0, 0.d0); pauli_z(2, 2) = complex(-1.d0, 0.d0)
+!     do i=1, count
+!         do j=1, nb
+!             m_x_comp = 0d0
+!             m_y_comp = 0d0
+!             m_z_comp = 0d0
+!             H_col = kp_eivec(i,:,j)
+!             do k=1, 9
+!                 chi_k = reshape([H_col(k), H_col(k+9)], [2, 1])
 
-                m_x_comp = matmul(conjg(transpose(chi_k)),matmul(pauli_x, chi_k))
-                m_y_comp = matmul(conjg(transpose(chi_k)),matmul(pauli_y, chi_k))
-                m_z_comp = matmul(conjg(transpose(chi_k)),matmul(pauli_z, chi_k))
+!                 m_x_comp = matmul(conjg(transpose(chi_k)),matmul(pauli_x, chi_k))
+!                 m_y_comp = matmul(conjg(transpose(chi_k)),matmul(pauli_y, chi_k))
+!                 m_z_comp = matmul(conjg(transpose(chi_k)),matmul(pauli_z, chi_k))
                 
-                m_x = m_x + real(m_x_comp(1,1))
-                m_y = m_y + real(m_x_comp(1,1))
-                m_z = m_z + real(m_x_comp(1,1))
-            enddo
-        enddo
-        m_k_data(:,i) = [m_x, m_y, m_z]
-    enddo
+!                 m_x = m_x + real(m_x_comp(1,1))
+!                 m_y = m_y + real(m_x_comp(1,1))
+!                 m_z = m_z + real(m_x_comp(1,1))
+!             enddo
+!         enddo
+!         m_k_data(:,i) = [m_x, m_y, m_z]
+!     enddo
 
 !-----Write to kmesh.dat
     do i=1, count
-       do k=1, 2
-         write(100,'(2(f12.6))') kpoints(k,i)
-       enddo
-         write(100,*)
-         write(100,*)
+        write(100,'(2(f12.6))') kpoints(1,i), kpoints(2,i)
     enddo
     call write_plt(nkpath,xkl,klabel,ef)
     stop
