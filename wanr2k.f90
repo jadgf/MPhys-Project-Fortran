@@ -2,21 +2,25 @@
       Implicit None
 !--------to be midified by the usere
       character(len=80):: prefix="BiTeI"
-      integer,parameter::nkpath=3,np=100
-      real*8,parameter::ef= 4.18903772
+      integer,parameter::nkpath=3,np=200
+!--------Variables for k-mesh:
+      integer,parameter::resolution = 50;
+      real*8,parameter::tolerance = 0.002;
+      real*8,parameter::energy_diff = 0.03;
 !------------------------------------------------------
-      integer*4 ik,ikmax
-      real*8 kz
+      integer*4 ik,ikmax, skip
+      real*8 kz,ef 
+      real*8 :: Te_sum, Bi_sum, I_sum
       character(len=30)::klabel(nkpath)
       character(len=80) hamil_file,nnkp,line
       integer*4,parameter::nk=(nkpath-1)*np+1
-      integer*4 i,j,k,nr,i1,i2,nb,lwork,info
+      integer*4 i,j,k,l,nr,i1,i2,nb,lwork,info
       real*8,parameter::third=1d0/3d0!,kz=0d0
       real*8 phase,pi2,jk,a,b
       real*8 klist(3,1:nk),xk(nk),kpath(3,np),bvec(3,3),ktemp1(3),ktemp2(3),xkl(nkpath)
-      real*8,allocatable:: rvec(:,:),ene(:,:),rwork(:)
+      real*8,allocatable:: rvec(:,:),ene(:,:),rwork(:),od(:,:,:)
       integer*4,allocatable:: ndeg(:)
-      complex*16,allocatable:: Hk(:,:),Hamr(:,:,:),work(:)
+      complex*16,allocatable:: Hk(:,:),Hamr(:,:,:),work(:),H_col(:)
       complex*16 temp1,temp2
 !------------------------------------------------------
       write(hamil_file,'(a,a)')trim(adjustl(prefix)),"_hr_topological.dat"
@@ -44,7 +48,7 @@
 
       ktemp1(:)=(kpath(1,1)-kpath(1,2))*bvec(:,1)+(kpath(2,1)-kpath(2,2))*bvec(:,2)+(kpath(3,1)-kpath(3,2))*bvec(:,3)
 
-!      xk(1)= 0d0 !-sqrt(dot_product(ktemp1,ktemp1))
+!     xk(1)= 0d0 !-sqrt(dot_product(ktemp1,ktemp1))
       xk(1)= -sqrt(dot_product(ktemp1,ktemp1))
       xkl(1)=xk(1)
       
@@ -74,7 +78,7 @@
       open(100,file='band.dat')
       read(99,*)
       read(99,*)nb,nr
-      allocate(rvec(3,nr),Hk(nb,nb),Hamr(nb,nb,nr),ndeg(nr),ene(nb,nk))
+      allocate(rvec(3,nr),Hk(nb,nb),Hamr(nb,nb,nr),ndeg(nr),ene(nb,nk),od(nb,nk,3),H_col(nb))
       read(99,*)ndeg
       do k=1,nr
          do i=1,nb
@@ -88,7 +92,7 @@
      lwork=max(1,2*nb-1)
      allocate(work(max(1,lwork)),rwork(max(1,3*nb-2)))
 
-!---- Fourrier transform H(R) to H(k)
+!---- Fourier transform H(R) to H(k)
       ene=0d0
       do k=1,nk
          HK=(0d0,0d0)
@@ -102,16 +106,38 @@
             HK=HK+Hamr(:,:,j)*dcmplx(cos(phase),-sin(phase))/float(ndeg(j))
 
          enddo
+         call zheev('V','U',nb,HK,nb,ene(:,k),work,lwork,rwork,info) 
 
-         call zheev('V','U',nb,Hk,nb,ene(:,k),work,lwork,rwork,info)
-         
+!------Orbital Probability Calculation:
+         do l=1, nb
+            H_col = HK(:,l)
+            Te_sum= 0.0d0
+            Bi_sum = 0.0d0
+            I_sum = 0.0d0
+            do i=1, 2
+               skip = 0
+               skip = (i-1)*9;
+               do j=1, 3
+                  Te_sum = Te_sum + real(conjg(H_col(j+skip)) * (H_col(j+skip)))
+                  Bi_sum = Bi_sum + real(conjg(H_col(j+3+skip)) * (H_col(j+3+skip)))
+                  I_sum =  I_sum + real((conjg(H_col(j+6+skip)) * (H_col(j+6+skip))))
+               enddo
+            enddo
+            od(l,k,:) = [Te_sum, Bi_sum, I_sum]
+         enddo
       enddo
+
+!-----Fermi level:
+      ef = (MAXVAL(ene(12, :)) + MINVAL(ene(13, :)))/2.0d0
+
+!-----Orbital probability:
+
 
       deallocate(HK,work)
       
       do i=1,nb
          do k=1,nk
-           write(100,'(2(x,f12.6))') xk(k),ene(i,k)
+           write(100,'(5(x,f12.6))') xk(k),ene(i,k),od(i,k,:)
          enddo
            write(100,*)
            write(100,*)
@@ -138,26 +164,52 @@
         if(trim(adjustl(kl(i))).eq.'g'.or.trim(adjustl(kl(i))).eq.'G')kl(i)="{/Symbol \107}"
         if(i.ne.nkp) write(99,'(3a,f12.6,a)')'"',trim(adjustl(kl(i))),'"',xkl(i),", \"
         if(i.eq.nkp) write(99,'(3a,f12.6,a)')'"',trim(adjustl(kl(i))),'"',xkl(i)," )"
+
      enddo
-     write(99,'(a,f12.6,a,f12.6,a)') 'set xrange [',xkl(1),':',xkl(nkp),']'
+     write(99,'(a,f12.6,a,f12.6,a)') 'set xrange [ -0.15 : 0.15]'
      write(99,'(a)') &
           'set terminal pdfcairo enhanced font "DejaVu"  transparent fontscale 1 size 5.00in, 7.50in'
      write(99,'(a,f4.2,a)')'set output "band.pdf"'
-     write(99,'(9(a,/),a)') &
+     write(99,'(12(a,/),a)') &
           'set encoding iso_8859_1',&
           'set size ratio 0 1.0,1.0',&
           'set ylabel "E-E_{CBM} (eV)"',&
-          'set yrange [ -2 : 2.0 ]',&
+          'set yrange [-2 : 2 ]',&
           'unset key',&
           'set ytics 1.0 scale 1 nomirror out',&
           'set mytics 2',&
           'set parametric',&
           'set trange [-10:10]',&
-          'plot "band.dat" u 1:($2-ef) with l lt 1 lw 3,\'
-    do i=2,nkp-1
-      write(99,'(f12.6,a)') xkl(i),',t with l lt 2  lc -1,\'
-    enddo
-    write(99,'(a)') 't,0 with l lt 2  lc -1'
+          'set multiplot',&
+          'plot "band.dat" u 1:($2-ef):(column(3)*1.5) with points pt 7 ps variable lc rgb "blue"',&
+          'plot "band.dat" u 1:($2-ef):(column(4)*1.5) with points pt 7 ps variable lc rgb "red"',&
+          'plot "band.dat" u 1:($2-ef):(column(5)*1.5) with points pt 7 ps variable lc rgb "green"'
+      write(99,'(a)') &
+          'plot "band.dat" u 1:($2-ef) with l lt 1 lw 1.5 lc rgb "yellow",\'
+      do i=2,nkp-1
+         write(99,' (f12.6,a)') xkl(i),',t with l lt 2  lc -1,\'
+          enddo
+      write(99,'(a)') '   t,0 with l lt 2  lc -1'
+      write(99,'(a)') &
+          'unset multiplot'
+      
+
     end subroutine write_plt
+
+!plot "band.dat" u 1:($2-ef) with l lt 1 lw 3,\
+!    0.000000,t with l lt 2 lc -1,\
+!    t,0 with l lt 2 lc -1
+!plot "band.dat" u 1:($2-ef):(column(3)) with points pt 7 ps variable
+!plot "band.dat" u 1:($2-ef):(column(4)) with points pt 7 ps variable
+!plot "band.dat" u 1:($2-ef):(column(5)) with points pt 7 ps variable
+!unset multiplot
+!------- 2D k-mesh
+!    subroutine construct_kmesh(resolution, tolerance, energy_diff, ene)
+!    implicit none
+!    end subroutine construct_kmesh
+
+
+
+
 
 ! ------ gfortran -o bandplot wanr2k.f90 -lblas -llapack
