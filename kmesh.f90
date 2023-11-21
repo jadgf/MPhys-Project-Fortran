@@ -5,7 +5,7 @@ Program Wannier_band_structure
     integer,parameter::nkpath=3,np=100,meshres=1000
     real*8,parameter::ef= 4.18903772,ikmax=0.1, tolerance = 0.05
 !------------------------------------------------------
-    real*8 kz,kmesh(3,meshres), CBM
+    real*8 kz,kmesh(3,meshres**2), CBM
     character(len=30)::klabel(nkpath)
     character(len=80) hamil_file,nnkp,line
     integer*4,parameter::nk=(nkpath-1)*np+1
@@ -28,7 +28,9 @@ Program Wannier_band_structure
 111   read(98,'(a)')line
     if(trim(adjustl(line)).ne."begin real_lattice") goto 111
     read(98,*)avec
-    if(trim(adjustl(line)).ne."begin recip_lattice") goto 111
+    do i=1,3
+        read(98, '(a)')line
+    enddo
     read(98,*)bvec
 !---------------kpath
     data kpath(:,1) /     0.5d0,      0.0d0,    0.5d0/  !L
@@ -64,7 +66,7 @@ Program Wannier_band_structure
 
 !------read H(R)
     open(99,file=trim(adjustl(hamil_file)),err=444)
-    open(100,file='band.dat')
+    open(100,file='kmesh.dat')
     read(99,*)
     read(99,*)nb,nr
     allocate(rvec_data(3,nr),Hk(nb,nb),Hamr(nb,nb,nr),ndeg(nr),ene(nb,nk))
@@ -104,8 +106,8 @@ Program Wannier_band_structure
     deallocate(Hk,ene,work)
     allocate(Hk(nb,nb),k_ene(nb))
 !----- Create K-mesh
-    do i=1,meshres+1
-        do j=1, meshres+1
+    do i=1,meshres
+        do j=1, meshres
             kmesh(1,i) = pi2*ikmax * (i-1) / meshres
             kmesh(2,i) = pi2*ikmax * (j-1) / meshres
             kmesh(3,i) = 0.5
@@ -113,6 +115,7 @@ Program Wannier_band_structure
     enddo
 
 !----- Perform cartesian fourier transform
+    count = 0
     do k=1,meshres**2
         HK=(0d0,0d0)
         do i=1,nr
@@ -131,9 +134,9 @@ Program Wannier_band_structure
     do i=1,SIZE(kpoints)
         print *, kpoints(1,i)
     enddo
-    do i=1,nb
-       do k=1,nk
-         write(100,'(2(x,f12.6))') xk(k),ene(i,k)
+    do i=1, count
+       do k=1, 2
+         write(100,'(2(f12.6))') kpoints(k,i)
        enddo
          write(100,*)
          write(100,*)
@@ -153,33 +156,22 @@ Program Wannier_band_structure
    real*8 xkl(nkp),ef
    character(len=30)kl(nkp)
    
-   open(99,file='band.plt')
-   write(99,'(a,f12.8)')'ef=',ef
-   write(99,'(a)') 'set xtics ( \'
-   do i=1,nkp
-      if(trim(adjustl(kl(i))).eq.'g'.or.trim(adjustl(kl(i))).eq.'G')kl(i)="{/Symbol \107}"
-      if(i.ne.nkp) write(99,'(3a,f12.6,a)')'"',trim(adjustl(kl(i))),'"',xkl(i),", \"
-      if(i.eq.nkp) write(99,'(3a,f12.6,a)')'"',trim(adjustl(kl(i))),'"',xkl(i)," )"
-   enddo
-   write(99,'(a,f12.6,a,f12.6,a)') 'set xrange [',xkl(1),':',xkl(nkp),']'
+   open(99,file='kmesh.plt')
+   write(99,'(a,f12.6,a,f12.6,a)') 'set xrange [-0.8 : 0.8]'
    write(99,'(a)') &
         'set terminal pdfcairo enhanced font "DejaVu"  transparent fontscale 1 size 5.00in, 7.50in'
-   write(99,'(a,f4.2,a)')'set output "band.pdf"'
+   write(99,'(a,f4.2,a)')'set output "kmesh.pdf"'
    write(99,'(9(a,/),a)') &
         'set encoding iso_8859_1',&
         'set size ratio 0 1.0,1.0',&
-        'set ylabel "E-E_{CBM} (eV)"',&
-        'set yrange [ -2 : 2.0 ]',&
+        'set ylabel "$k_{y}$ coordinate"',&
+        'set yrange [ -0.8 : 0.8 ]',&
         'unset key',&
         'set ytics 1.0 scale 1 nomirror out',&
         'set mytics 2',&
         'set parametric',&
         'set trange [-10:10]',&
-        'plot "band.dat" u 1:($2-ef) with l lt 1 lw 3,\'
-  do i=2,nkp-1
-    write(99,'(f12.6,a)') xkl(i),',t with l lt 2  lc -1,\'
-  enddo
-  write(99,'(a)') 't,0 with l lt 2  lc -1'
+        'plot "kmesh.dat" u 1:2 with points lt 1 lw 3,\'
   end subroutine write_plt
 
 ! ------ gfortran -o bandplot wanr2k.f90 -lblas -llapack
