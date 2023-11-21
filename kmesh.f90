@@ -5,7 +5,7 @@ Program Wannier_band_structure
     integer,parameter::nkpath=3,np=100,meshres=100
     real*8,parameter::ef= 4.18903772,ikmax=0.1, tolerance = 0.05
 !------------------------------------------------------
-    real*8 kz, kmesh(3,meshres**2), dx, dy, CBM
+    real*8 kz, kmesh(3,meshres**2), dx, dy, CBM, m_x, m_y, m_z
     character(len=30)::klabel(nkpath)
     character(len=80) hamil_file,nnkp,line
     integer*4,parameter::nk=(nkpath-1)*np+1
@@ -14,10 +14,11 @@ Program Wannier_band_structure
     real*8,parameter::third=1d0/3d0!,kz=0d0
     real*8 phase,pi2,jk,a,b
     real*8 klist(3,1:nk),xk(nk),kpath(3,np),avec(3,3),bvec(3,3),ktemp1(3),ktemp2(3),xkl(nkpath),rvec(3)
-    real*8,allocatable:: rvec_data(:,:),ene(:,:),rwork(:),k_ene(:),kpoints(:,:)
+    real*8,allocatable:: rvec_data(:,:),ene(:,:),rwork(:),k_ene(:),kpoints(:,:), m_k_data(:,:)
     integer*4,allocatable:: ndeg(:)
-    complex*16,allocatable:: Hk(:,:),Hamr(:,:,:),work(:)
-    complex*16 temp1,temp2
+    complex*16,allocatable:: Hk(:,:),Hamr(:,:,:),work(:),kp_eivec(:,:,:),H_col(:)
+    complex*16 temp1,temp2,chi_k(2,1),m_x_comp(1,1), m_y_comp(1,1), m_z_comp(1,1)
+    complex*8 pauli_x(2, 2), pauli_y(2, 2), pauli_z(2, 2)
 !------------------------------------------------------
     write(hamil_file,'(a,a)')trim(adjustl(prefix)),"_hr_topological.dat"
     write(nnkp,'(a,a)')      trim(adjustl(prefix)),".nnkp"
@@ -106,7 +107,7 @@ Program Wannier_band_structure
     print *, "CBM: ", CBM
 
     deallocate(Hk,ene,work,rwork)
-    allocate(Hk(nb,nb),k_ene(nb))
+    allocate(Hk(nb,nb),k_ene(nb), H_col(nb))
     lwork=max(1,2*nb-1)
     allocate(work(max(1,lwork)),rwork(max(1,3*nb-2)))
 !----- Create K-mesh
@@ -135,25 +136,51 @@ Program Wannier_band_structure
         print *, k_ene(13)
         if((ABS(k_ene(13) - (CBM+0.02)).lt.tolerance).or.(ABS(k_ene(14) - (CBM+0.02)).lt.tolerance)) then
             count = count + 1
-            allocate(kpoints(3,count))
+            allocate(kpoints(3,count),kp_eivec(count,nb,nb), m_k_data(3,count))
             kpoints(:,count) = kmesh(:,k)
+            kp_eivec(count,:,:) = Hk(:,:)
         endif
     enddo
-    print *, count
 
-!     do i=1, count
-!        do k=1, 2
-!          write(100,'(2(f12.6))') kpoints(k,i)
-!        enddo
-!          write(100,*)
-!          write(100,*)
-!     enddo
-!     call write_plt(nkpath,xkl,klabel,ef)
-!     stop
-! 333   write(*,'(3a)')'ERROR: input file "',trim(adjustl(nnkp)),' not found'
-!     stop
-! 444   write(*,'(3a)')'ERROR: input file "',trim(adjustl(hamil_file)),' not found'
-!     stop
+!-----Spin projection
+    pauli_x(1, 1) = complex(0.d0, 0.d0); pauli_x(1, 2) = complex(1.d0, 0.d0); pauli_x(2, 1) = complex(1.d0, 0.d0); pauli_x(2, 2) = complex(0.d0, 0.d0)
+    pauli_y(1, 1) = complex(0.d0, 0.d0); pauli_y(1, 2) = complex(0.d0, -1.d0); pauli_y(2, 1) = complex(0.d0, 1.d0); pauli_y(2, 2) = complex(0.d0, 0.d0)
+    pauli_z(1, 1) = complex(1.d0, 0.d0); pauli_z(1, 2) = complex(0.d0, 0.d0); pauli_z(2, 1) = complex(0.d0, 0.d0); pauli_z(2, 2) = complex(-1.d0, 0.d0)
+    do i=1, count
+        do j=1, nb
+            m_x_comp = 0d0
+            m_y_comp = 0d0
+            m_z_comp = 0d0
+            H_col = kp_eivec(i,:,j)
+            do k=1, 9
+                chi_k = reshape([H_col(k), H_col(k+9)], [2, 1])
+
+                m_x_comp = matmul(conjg(transpose(chi_k)),matmul(pauli_x, chi_k))
+                m_y_comp = matmul(conjg(transpose(chi_k)),matmul(pauli_y, chi_k))
+                m_z_comp = matmul(conjg(transpose(chi_k)),matmul(pauli_z, chi_k))
+                
+                m_x = m_x + real(m_x_comp(1,1))
+                m_y = m_y + real(m_x_comp(1,1))
+                m_z = m_z + real(m_x_comp(1,1))
+            enddo
+        enddo
+        m_k_data(:,i) = [m_x, m_y, m_z]
+    enddo
+
+!-----Write to kmesh.dat
+    do i=1, count
+       do k=1, 2
+         write(100,'(2(f12.6))') kpoints(k,i)
+       enddo
+         write(100,*)
+         write(100,*)
+    enddo
+    call write_plt(nkpath,xkl,klabel,ef)
+    stop
+333   write(*,'(3a)')'ERROR: input file "',trim(adjustl(nnkp)),' not found'
+    stop
+444   write(*,'(3a)')'ERROR: input file "',trim(adjustl(hamil_file)),' not found'
+    stop
 
 end
 
