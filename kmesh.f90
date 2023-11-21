@@ -2,10 +2,10 @@ Program Wannier_band_structure
     Implicit None
 !--------to be midified by the usere
     character(len=80):: prefix="BiTeI"
-    integer,parameter::nkpath=3,np=100,meshres=1000
+    integer,parameter::nkpath=3,np=100,meshres=100
     real*8,parameter::ef= 4.18903772,ikmax=0.1, tolerance = 0.05
 !------------------------------------------------------
-    real*8 kz,kmesh(3,meshres**2), CBM
+    real*8 kz, kmesh(3,meshres**2), dx, dy, CBM
     character(len=30)::klabel(nkpath)
     character(len=80) hamil_file,nnkp,line
     integer*4,parameter::nk=(nkpath-1)*np+1
@@ -24,13 +24,13 @@ Program Wannier_band_structure
     pi2=4.0d0*atan(1.0d0)*2.0d0
 
 !---------------  reciprocal vectors
-    open(98,file=trim(adjustl(nnkp)),err=333)
-111   read(98,'(a)')line
+    open(98,file=trim(adjustl(nnkp)))
+111 read(98,'(a)')line
     if(trim(adjustl(line)).ne."begin real_lattice") goto 111
     read(98,*)avec
-    do i=1,3
-        read(98, '(a)')line
-    enddo
+    read(98,'(a)')line
+    read(98,'(a)')line
+    read(98,'(a)')line
     read(98,*)bvec
 !---------------kpath
     data kpath(:,1) /     0.5d0,      0.0d0,    0.5d0/  !L
@@ -65,7 +65,7 @@ Program Wannier_band_structure
     klist=klist*pi2
 
 !------read H(R)
-    open(99,file=trim(adjustl(hamil_file)),err=444)
+    open(99,file=trim(adjustl(hamil_file)))
     open(100,file='kmesh.dat')
     read(99,*)
     read(99,*)nb,nr
@@ -106,14 +106,17 @@ Program Wannier_band_structure
     deallocate(Hk,ene,work)
     allocate(Hk(nb,nb),k_ene(nb))
 !----- Create K-mesh
-    do i=1,meshres
-        do j=1, meshres
-            kmesh(1,i) = pi2*ikmax * (i-1) / meshres
-            kmesh(2,i) = pi2*ikmax * (j-1) / meshres
-            kmesh(3,i) = 0.5
+    dx = 2.0 * ikmax / meshres
+    dy = 2.0 * ikmax / meshres
+    kmesh(3,:) = 0.5
+    count=1
+    do i=1,meshres+1
+        do j=1,meshres+1
+            kmesh(1, count) = -ikmax + dx * (i - 1)
+            kmesh(2, count) = -ikmax + dy * (j - 1)
+            count = count + 1
         enddo 
     enddo
-
 !----- Perform cartesian fourier transform
     count = 0
     do k=1,meshres**2
@@ -131,9 +134,6 @@ Program Wannier_band_structure
         endif
     enddo
 
-    do i=1,SIZE(kpoints)
-        print *, kpoints(1,i)
-    enddo
     do i=1, count
        do k=1, 2
          write(100,'(2(f12.6))') kpoints(k,i)
@@ -148,7 +148,7 @@ Program Wannier_band_structure
 444   write(*,'(3a)')'ERROR: input file "',trim(adjustl(hamil_file)),' not found'
     stop
 
-    end
+end
 
    subroutine write_plt(nkp,xkl,kl,ef)
    implicit none
@@ -174,4 +174,4 @@ Program Wannier_band_structure
         'plot "kmesh.dat" u 1:2 with points lt 1 lw 3,\'
   end subroutine write_plt
 
-! ------ gfortran -o bandplot wanr2k.f90 -lblas -llapack
+! ! ------ gfortran -o bandplot wanr2k.f90 -lblas -llapack
