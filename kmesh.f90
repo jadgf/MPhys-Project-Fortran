@@ -9,7 +9,8 @@ Program Wannier_band_structure
     character(len=30)::klabel(nkpath)
     character(len=80) hamil_file,nnkp,line
     integer*4,parameter::nk=(nkpath-1)*np+1
-    integer*4 i,j,k,nr,i1,i2,nb,lwork,info,count
+    integer*4 i,j,k,nr,i1,i2,nb,lwork,info
+    integer*8 count
     real*8,parameter::third=1d0/3d0!,kz=0d0
     real*8 phase,pi2,jk,a,b
     real*8 klist(3,1:nk),xk(nk),kpath(3,np),avec(3,3),bvec(3,3),ktemp1(3),ktemp2(3),xkl(nkpath),rvec(3)
@@ -102,16 +103,19 @@ Program Wannier_band_structure
        
     enddo
     CBM = MINVAL(ene(13, :))
+    print *, "CBM: ", CBM
 
-    deallocate(Hk,ene,work)
+    deallocate(Hk,ene,work,rwork)
     allocate(Hk(nb,nb),k_ene(nb))
+    lwork=max(1,2*nb-1)
+    allocate(work(max(1,lwork)),rwork(max(1,3*nb-2)))
 !----- Create K-mesh
     dx = 2.0 * ikmax / meshres
     dy = 2.0 * ikmax / meshres
     kmesh(3,:) = 0.5
     count=1
-    do i=1,meshres+1
-        do j=1,meshres+1
+    do i=1,meshres ! +1 to include +0.1 point
+        do j=1,meshres ! +1 to include +0.1 point
             kmesh(1, count) = -ikmax + dx * (i - 1)
             kmesh(2, count) = -ikmax + dy * (j - 1)
             count = count + 1
@@ -119,34 +123,37 @@ Program Wannier_band_structure
     enddo
 !----- Perform cartesian fourier transform
     count = 0
+    k_ene = 0d0
     do k=1,meshres**2
         HK=(0d0,0d0)
         do i=1,nr
             rvec = rvec_data(1,i) * avec(:,1) + rvec_data(2,i) * avec(:,2) + rvec_data(3,i) * avec(:,3)
             phase = rvec(1)*kmesh(1,k) + rvec(2)*kmesh(2,k) + rvec(3)*kmesh(3,k)
-            HK=HK+Hamr(:,:,j)*dcmplx(cos(phase),-sin(phase))/float(ndeg(j))
+            HK=HK+Hamr(:,:,i)*dcmplx(cos(phase),-sin(phase))/float(ndeg(i))
         enddo
-        call zheev('V','U',nb,Hk,nb,k_ene,work,lwork,rwork,info)
-        if((ABS(k_ene(12) - CBM).lt.tolerance).or.(ABS(k_ene(13) - CBM).lt.tolerance)) then
+        call zheev('V','U',nb,HK,nb,k_ene,work,lwork,rwork,info)
+        print *, k_ene(13)
+        if((ABS(k_ene(13) - (CBM+0.02)).lt.tolerance).or.(ABS(k_ene(14) - (CBM+0.02)).lt.tolerance)) then
             count = count + 1
             allocate(kpoints(3,count))
             kpoints(:,count) = kmesh(:,k)
         endif
     enddo
+    print *, count
 
-    do i=1, count
-       do k=1, 2
-         write(100,'(2(f12.6))') kpoints(k,i)
-       enddo
-         write(100,*)
-         write(100,*)
-    enddo
-    call write_plt(nkpath,xkl,klabel,ef)
-    stop
-333   write(*,'(3a)')'ERROR: input file "',trim(adjustl(nnkp)),' not found'
-    stop
-444   write(*,'(3a)')'ERROR: input file "',trim(adjustl(hamil_file)),' not found'
-    stop
+!     do i=1, count
+!        do k=1, 2
+!          write(100,'(2(f12.6))') kpoints(k,i)
+!        enddo
+!          write(100,*)
+!          write(100,*)
+!     enddo
+!     call write_plt(nkpath,xkl,klabel,ef)
+!     stop
+! 333   write(*,'(3a)')'ERROR: input file "',trim(adjustl(nnkp)),' not found'
+!     stop
+! 444   write(*,'(3a)')'ERROR: input file "',trim(adjustl(hamil_file)),' not found'
+!     stop
 
 end
 
@@ -175,3 +182,4 @@ end
   end subroutine write_plt
 
 ! ! ------ gfortran -o bandplot wanr2k.f90 -lblas -llapack
+! gfortran -o kplot  kmesh.f90 -LC:/msys64/ucrt64/lib/lapack-3.11.0/build/lib -llapack -lblas
