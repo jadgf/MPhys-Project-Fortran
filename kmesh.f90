@@ -2,8 +2,8 @@ Program Wannier_band_structure
     Implicit None
 !--------to be midified by the usere
     character(len=80):: prefix="BiTeI"
-    integer,parameter::nkpath=3,np=100,meshres=110
-    real*8,parameter::ef= 4.18903772,ikmax=0.1, tolerance = 0.005, energy_diff = 0.02
+    real*8,parameter::ef= 4.18903772,ikmax=0.1, tolerance = 0.001, energy_diff = 0.02
+    integer,parameter::nkpath=3,np=100,meshres=500, pre_size = int(5*(meshres**2*tolerance))
 !------------------------------------------------------
     real*8 kmesh(3,meshres**2), dx, dy, CBM, m_x, m_y, m_z, L_x, L_y, L_z
     character(len=30)::klabel(nkpath)
@@ -127,7 +127,7 @@ Program Wannier_band_structure
     enddo
     
 !----- Perform cartesian fourier transform
-    allocate(kpoints(2,400), kp_eivec(400,nb,nb), m_k_data(3,400),  L_k_data(3,400))
+    allocate(kpoints(2,pre_size), kp_eivec(pre_size,nb,nb), m_k_data(3,pre_size),  L_k_data(3,pre_size))
 
     count=1
     k_ene = 0d0
@@ -220,7 +220,7 @@ Program Wannier_band_structure
     enddo
     
 !-----Write to kmesh.dat
-    do i=1, count
+    do i=1, count-1
         write(100,'(8(f12.6))') kpoints(1,i), kpoints(2,i), m_k_data(1,i)/30, m_k_data(2,i)/30, m_k_data(3,i)/30,&
                                 L_k_data(1,i)/20, L_k_data(2,i)/20, L_k_data(3,i)/20
     enddo
@@ -245,7 +245,7 @@ end
     write(99, '(a)') 'set title "2D k-mesh plot at 20meV above CBM"'
     write(99, '(a)') 'set terminal pdfcairo enhanced font "DejaVu" transparent fontscale 1 size 5.00in, 5.00in'
     write(99, '(a)') 'set output "kmesh.pdf"'
-    write(99, '(15(a,/),a)') &
+    write(99, '(12(a,/),a)') &
         'set encoding iso_8859_1', &
         'set size ratio 0 1.0,1.0', &
         'set ylabel "k_y coordinate"', &
@@ -254,16 +254,19 @@ end
         'unset key', &
         'set ytics 0.05 scale 1 nomirror out', &
         'set mytics 2', &
-        'set parametric', &
-        'set trange [-10:10]', &
         'set multiplot', &
-        'plot "kmesh.dat" u 1:2 with points lt 1 lw 3', &
+        'R(x,y) = sqrt(x*x + y*y)', &
+        'theta(x,y) = atan2(y,x)', &
+        'gap = 0.05', &
+        'set style data linespoints', &
+        'set datafile missing NaN', &
+        'plot "kmesh.dat" u (R($1,$2) < gap ? $1 : NaN) : ($2) : (theta($1,$2)) pt 7 ps 0.01 lt 5 lw 7 smooth zsort, \', &
+        '     "kmesh.dat" u (R($1,$2) > gap ? $1 : NaN) : ($2) : (theta($1,$2)) pt 7 ps 0.01 lt 5 lw 7 smooth zsort', &
         '#For Spin Projection: (use # to comment out either one)', &
         'plot "kmesh.dat" using 1:2:3:4 with vectors head filled lt 1 lc rgb "blue"', &
         '#For Angular Momentum Projection:', &
-        'plot "kmesh.dat" using 1:2:6:7 with vectors head filled lt 1 lc rgb "blue"', &
+        '#plot "kmesh.dat" using 1:2:6:7 with vectors head filled lt 1 lc rgb "blue"', &
         'unset multiplot'
-
     close(99)
    end subroutine write_plt
 
