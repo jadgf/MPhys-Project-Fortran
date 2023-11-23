@@ -2,8 +2,8 @@ Program Wannier_band_structure
     Implicit None
 !--------to be midified by the usere
     character(len=80):: prefix="data/BiTeI"
-    real*8,parameter::ef= 4.18903772,ikmax=0.08, tolerance = 0.0015, energy_diff = 0.02
-    integer,parameter::nkpath=3,np=100,meshres=250, pre_size = int(10*(meshres**2*tolerance))
+    real*8,parameter::ef= 4.18903772,ikmax=0.07, tolerance = 0.001, energy_diff = 0.02
+    integer,parameter::nkpath=3,np=100,meshres=400, pre_size = int(10*(meshres**2*tolerance))
 !------------------------------------------------------
     real*8 kmesh(3,meshres**2), dx, dy, CBM, m_x, m_y, m_z, L_x, L_y, L_z
     character(len=30)::klabel(nkpath)
@@ -262,13 +262,12 @@ end
         'set style arrow 1 head filled size screen 0.02,10,45 lt 1 lc palette', &
         ' '
 !------Sort by angle and radius
-    write(99, '(6(a,/),a)') &
+    write(99, '(5(a,/),a)') &
         '#Connect two rings separately', &
         'theta(x,y) = atan2(y,x)', &
         'RingX(colX,colY,b) = (x1=column(colX), y1=column(colY), sqrt(x1**2 + y1**2) < 0.04)^b ? \', &
         '             (f ? (x2=x1,y2=y1):(f=1,x0=x1,y0=y1),$1) : NaN', &
         'angle(colX,colY)   = theta(column(colY),column(colX))', &
-        'gap = 0.05', &
         ' '
     write(99, '(5(a,/),a)') &
         'set style data linespoints', &
