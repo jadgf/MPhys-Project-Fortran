@@ -2,8 +2,8 @@ module parameters
     Implicit None
 !--------to be midified by the usere
     character(len=80):: prefix="BiTeI"
-    real*8,parameter::ef= 4.18903772,kmax=0.07
-    integer,parameter::meshres=100, nkpoints=(2*meshres+1),nbmin=12,nbmax=13
+    real*8,parameter::ef= 4.18903772,kmax=0.2
+    integer,parameter::meshres=50, nkpoints=(2*meshres+1),nbmin=12,nbmax=13
     integer nb
 end module parameters
 
@@ -11,15 +11,15 @@ Program Projected_band_structure
     use parameters
     Implicit None
 !------------------------------------------------------
-    real*8 dx, dy, CBM, m_x, m_y, m_z, L_x, L_y, L_z
+    real*8 dx, dy
     character(len=80) hamil_file,nnkp,line
-    integer*4 i,j,k,nr,i1,i2,lwork,info,kcount,ikx,iky
+    integer*4 i,j,k,nr,i1,i2,lwork,info,ikx,iky
     real*8,parameter::third=1d0/3d0, two = 2.0d0, sqrt2 = sqrt(two)
-    real*8 phase,pi2,jk,a,b
+    real*8 phase,pi2,a,b
     real*8 avec(3,3),bvec(3,3),rvec(3),kpoint(3)
     real*8,allocatable:: rvec_data(:,:),ene(:),rwork(:),k_ene(:),kpoints(:,:), sam(:,:), oam(:,:)
     integer*4,allocatable:: ndeg(:)
-    complex*16,allocatable:: Hk(:,:),Hamr(:,:,:),work(:),kp_eivec(:,:,:),H_col(:)
+    complex*16,allocatable:: Hk(:,:),Hamr(:,:,:),work(:)
     complex*8, parameter:: one = complex(1.d0,0.d0),im = complex(0.d0,1.d0), zero = complex(0.d0,0.d0)
 !------------------------------------------------------
     write(hamil_file,'(a,a)')trim(adjustl(prefix)),"_hr_topological.dat"
@@ -86,9 +86,8 @@ Program Projected_band_structure
                                     ' item', 3*nkpoints*nkpoints,' data follows'
 
 !----- Perform fourier transform
-    allocate(sam(3,nbmin:nbmax), oam(3,nbmin:nbmax))
+    allocate(sam(3,nbmin:nbmax), oam(3,nbmin:nbmax), k_ene(nb))
 
-    k_ene = 0d0
     do ikx=-meshres,meshres
         do iky=-meshres,meshres
             kpoint(1)= ikx*dx/meshres
@@ -145,13 +144,6 @@ subroutine projections(H,sam,oam)
     data pauli_y / (0d0,0d0),(0d0,-1d0),(0d0,1d0),( 0d0,0d0)/
     data pauli_z / (1d0,0d0),(0d0, 0d0),(0d0,0d0),(-1d0,0d0)/
 
-    ! Lx= (/zero,one,zero,one,zero,one,zero,one,zero/)
-    ! Ly= (/zero,-im,zero,im,zero,-im,zero,im,zero/)
-    ! Lz= (/one,zero,zero,zero,zero,zero,zero,zero,-one/)
-
-    ! Lx = Lx*1/sqrt2
-    ! Ly = Ly*1/sqrt2
-
     sam=0d0 
     oam=0d0
 
@@ -160,20 +152,26 @@ subroutine projections(H,sam,oam)
                 chi(1,1) = H(jb     ,ib) 
                 chi(2,1) = H(jb+nb/2,ib)
 
-                ! phi(1,1) = H((k-1)*3+1,ib)
-                ! phi(2,1) = H((k-1)*3+2,ib)
-                ! phi(3,1) = H((k-1)*3+3,ib)
-                ! Y_lm= (/(-sqrt2/2) * (H((k-1)*3+1,ib) + im*phi(2,1) = H((k-1)*3+2,ib)),(sqrt2/2) * (H((k-1)*3+1,ib) - im*phi(2,1) = H((k-1)*3+2,ib)),H((k-1)*3+3,ib)/)
+              
                 sx = matmul(conjg(transpose(chi)),matmul(pauli_x, chi))
                 sy = matmul(conjg(transpose(chi)),matmul(pauli_y, chi))
                 sz = matmul(conjg(transpose(chi)),matmul(pauli_z, chi))
                 sam(1)=sam(1)+sx(1,1)
                 sam(2)=sam(2)+sy(1,1)
                 sam(3)=sam(3)+sz(1,1)
-                ! oam=oam+matmul(conjg(transpose(Y_lm)),matmul(Lx, Y_lm))
+           
             enddo
     enddo
 end subroutine projections
 
-! ! ------ gfortran -o kmesh kmesh.f90 -lblas -llapack
-! gfortran -o kplot  kmesh.f90 -LC:/msys64/ucrt64/lib/lapack-3.11.0/build/lib -llapack -lblas
+! Lx= (/zero,one,zero,one,zero,one,zero,one,zero/)
+! Ly= (/zero,-im,zero,im,zero,-im,zero,im,zero/)
+! Lz= (/one,zero,zero,zero,zero,zero,zero,zero,-one/)
+
+! Lx = Lx*1/sqrt2
+! Ly = Ly*1/sqrt2
+! phi(1,1) = H((k-1)*3+1,ib)
+! phi(2,1) = H((k-1)*3+2,ib)
+! phi(3,1) = H((k-1)*3+3,ib)
+! Y_lm= (/(-sqrt2/2) * (H((k-1)*3+1,ib) + im*phi(2,1) = H((k-1)*3+2,ib)),(sqrt2/2) * (H((k-1)*3+1,ib) - im*phi(2,1) = H((k-1)*3+2,ib)),H((k-1)*3+3,ib)/)
+! oam=oam+matmul(conjg(transpose(Y_lm)),matmul(Lx, Y_lm))
