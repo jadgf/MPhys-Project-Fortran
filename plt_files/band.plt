@@ -5,7 +5,7 @@ set xtics ( \
 "H"    0.966523 )
 set xrange [ -0.15 : 0.15]
 set terminal pdfcairo enhanced font "DejaVu"  transparent fontscale 1 size 5.00in, 7.50in
-set output "band.pdf"
+set output "pdfs/band.pdf"
 set encoding iso_8859_1
 set size ratio 0 1.0,1.0
 set ylabel "E-E_{CBM} (eV)"

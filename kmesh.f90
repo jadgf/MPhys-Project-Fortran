@@ -1,9 +1,9 @@
 Program Wannier_band_structure
     Implicit None
 !--------to be midified by the usere
-    character(len=80):: prefix="BiTeI"
-    real*8,parameter::ef= 4.18903772,ikmax=0.1, tolerance = 0.001, energy_diff = 0.02
-    integer,parameter::nkpath=3,np=100,meshres=500, pre_size = int(5*(meshres**2*tolerance))
+    character(len=80):: prefix="data/BiTeI"
+    real*8,parameter::ef= 4.18903772,ikmax=0.08, tolerance = 0.001, energy_diff = 0.02
+    integer,parameter::nkpath=3,np=100,meshres=200, pre_size = int(10*(meshres**2*tolerance))
 !------------------------------------------------------
     real*8 kmesh(3,meshres**2), dx, dy, CBM, m_x, m_y, m_z, L_x, L_y, L_z
     character(len=30)::klabel(nkpath)
@@ -70,7 +70,7 @@ Program Wannier_band_structure
 
 !------read H(R)
     open(99,file=trim(adjustl(hamil_file)),err=444)
-    open(100,file='kmesh.dat')
+    open(100,file='dat_files/kmesh.dat')
     read(99,*)
     read(99,*)nb,nr
     allocate(rvec_data(3,nr),Hk(nb,nb),Hamr(nb,nb,nr),ndeg(nr),ene(nb,nk))
@@ -221,10 +221,10 @@ Program Wannier_band_structure
     
 !-----Write to kmesh.dat
     do i=1, count-1
-        write(100,'(8(f12.6))') kpoints(1,i), kpoints(2,i), m_k_data(1,i)/30, m_k_data(2,i)/30, m_k_data(3,i)/30,&
-                                L_k_data(1,i)/20, L_k_data(2,i)/20, L_k_data(3,i)/20
+        write(100,'(8(f12.6))') kpoints(1,i), kpoints(2,i), m_k_data(1,i)/30, m_k_data(2,i)/30, m_k_data(3,i),&
+                                L_k_data(1,i)/20, L_k_data(2,i)/20, L_k_data(3,i)
     enddo
-    call write_plt(energy_diff)
+    call write_plt()
     stop
 333   write(*,'(3a)')'ERROR: input file "',trim(adjustl(nnkp)),' not found'
     stop
@@ -234,38 +234,51 @@ Program Wannier_band_structure
 end
 
 !-----kmesh.plt subroutine
-   subroutine write_plt(energy_diff)
+   subroutine write_plt()
     implicit none
-    real*8, intent(in) :: energy_diff
-    real*8 e_converted
-    e_converted =1000* energy_diff
-    open(99, file='kmesh.plt')
+    open(99, file='plt_files/kmesh.plt')
     
-    write(99, '(a)') 'set xrange [-0.1 : 0.1]'
-    write(99, '(a)') 'set title "2D k-mesh plot at 20meV above CBM"'
-    write(99, '(a)') 'set terminal pdfcairo enhanced font "DejaVu" transparent fontscale 1 size 5.00in, 5.00in'
-    write(99, '(a)') 'set output "kmesh.pdf"'
-    write(99, '(12(a,/),a)') &
+    write(99, '(6(a,/),a)') &
+        '#set title "Spin Projection"', &
+        'set title "Orbital Angular Momentum Projection"', &
+        'set terminal pdfcairo enhanced font "DejaVu" transparent fontscale 1 size 8.00in, 8.00in', &
+        'set output "pdfs/kmesh.pdf"', &
         'set encoding iso_8859_1', &
         'set size ratio 0 1.0,1.0', &
-        'set ylabel "k_y coordinate"', &
-        'set xlabel "k_x coordinate"', &
+        ' '
+    write(99, '(8(a,/),a)') &
+        'set xlabel "k_x"', &
+        'set ylabel "k_y"', &
+        'set xrange [-0.1 : 0.1]', &
         'set yrange [ -0.1 : 0.1 ]', &
         'unset key', &
         'set ytics 0.05 scale 1 nomirror out', &
         'set mytics 2', &
         'set multiplot', &
+        ' '
+!------Sort by angle and radius
+    write(99, '(6(a,/),a)') &
+        '#Connect two rings separately', &
         'R(x,y) = sqrt(x*x + y*y)', &
         'theta(x,y) = atan2(y,x)', &
         'gap = 0.05', &
         'set style data linespoints', &
         'set datafile missing NaN', &
+        ' '
+!-----Arrow Colour
+    write(99, '(6(a,/),a)') &
+        '#Palette for arrows', &
+        'set palette defined ( 0 "blue", 0.5 "white", 1 "red" )', &
+        'set cblabel "m_z"', &
+        'set style arrow 1 head filled size screen 0.02,10,45 lt 1 lc palette', &
+        ' '
+!-----Ring plot
+    write(99, '(4(a,/),a)') &
+        '#Plot two rings', &
         'plot "kmesh.dat" u (R($1,$2) < gap ? $1 : NaN) : ($2) : (theta($1,$2)) pt 7 ps 0.01 lt 5 lw 7 smooth zsort, \', &
-        '     "kmesh.dat" u (R($1,$2) > gap ? $1 : NaN) : ($2) : (theta($1,$2)) pt 7 ps 0.01 lt 5 lw 7 smooth zsort', &
-        '#For Spin Projection: (use # to comment out either one)', &
-        'plot "kmesh.dat" using 1:2:3:4 with vectors head filled lt 1 lc rgb "blue"', &
-        '#For Angular Momentum Projection:', &
-        '#plot "kmesh.dat" using 1:2:6:7 with vectors head filled lt 1 lc rgb "blue"', &
+        '     "kmesh.dat" u (R($1,$2) > gap ? $1 : NaN) : ($2) : (theta($1,$2)) pt 7 ps 0.01 lt 5 lw 7 smooth zsort, \', &
+        '     "kmesh.dat" u 1:2:3:4:5 with vectors arrowstyle 1  #Spin Projection', &
+        '#"kmesh.dat" u 1:2:6:7:8 with vectors arrowstyle 1  #Angular Momentum Projection', &
         'unset multiplot'
     close(99)
    end subroutine write_plt
