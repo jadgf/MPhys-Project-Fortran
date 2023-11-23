@@ -2,15 +2,14 @@ Program Wannier_band_structure
     Implicit None
 !--------to be midified by the usere
     character(len=80):: prefix="data/BiTeI"
-    real*8,parameter::ef= 4.18903772,ikmax=0.08, tolerance = 0.001, energy_diff = 0.02
-    integer,parameter::nkpath=3,np=100,meshres=200, pre_size = int(10*(meshres**2*tolerance))
+    real*8,parameter::ef= 4.18903772,ikmax=0.08, tolerance = 0.0015, energy_diff = 0.02
+    integer,parameter::nkpath=3,np=100,meshres=250, pre_size = int(10*(meshres**2*tolerance))
 !------------------------------------------------------
     real*8 kmesh(3,meshres**2), dx, dy, CBM, m_x, m_y, m_z, L_x, L_y, L_z
     character(len=30)::klabel(nkpath)
     character(len=80) hamil_file,nnkp,line
     integer*4,parameter::nk=(nkpath-1)*np+1
-    integer*4 i,j,k,nr,i1,i2,nb,lwork,info
-    integer*8 count
+    integer*4 i,j,k,nr,i1,i2,nb,lwork,info,count
     real*8,parameter::third=1d0/3d0, two = 2.0d0, sqrt2 = sqrt(two)
     real*8 phase,pi2,jk,a,b
     real*8 klist(3,1:nk),xk(nk),kpath(3,np),avec(3,3),bvec(3,3),ktemp1(3),ktemp2(3),xkl(nkpath),rvec(3),kvec(3)
@@ -150,16 +149,15 @@ Program Wannier_band_structure
     print *, "Number of intersections: ", count-1
 
 !-----Spin projection
-   !--Define Pauli matrices
+   !-Define Pauli matrices
     pauli_x(1, 1) = complex(0.d0, 0.d0); pauli_x(1, 2) = complex(1.d0, 0.d0)
         pauli_x(2, 1) = complex(1.d0, 0.d0); pauli_x(2, 2) = complex(0.d0, 0.d0)
     pauli_y(1, 1) = complex(0.d0, 0.d0); pauli_y(1, 2) = complex(0.d0, -1.d0)
         pauli_y(2, 1) = complex(0.d0, 1.d0); pauli_y(2, 2) = complex(0.d0, 0.d0)
     pauli_z(1, 1) = complex(1.d0, 0.d0); pauli_z(1, 2) = complex(0.d0, 0.d0)
         pauli_z(2, 1) = complex(0.d0, 0.d0); pauli_z(2, 2) = complex(-1.d0, 0.d0)
-   !----Defined
+   !-Defined
     do i=1, count-1
-        ! do j=1, nb
             m_x = 0d0
             m_y = 0d0
             m_z = 0d0
@@ -174,7 +172,6 @@ Program Wannier_band_structure
                 m_y = m_y + real(m_y_comp(1,1))
                 m_z = m_z + real(m_z_comp(1,1))
             enddo
-        ! enddo
         m_k_data(:,i) = [m_x, m_y, m_z]
     enddo
 
@@ -236,7 +233,7 @@ end
 !-----kmesh.plt subroutine
    subroutine write_plt()
     implicit none
-    open(99, file='plt_files/kmesh.plt')
+    open(99, file='plt/kmesh.plt')
     
     write(99, '(6(a,/),a)') &
         '#set title "Spin Projection"', &
@@ -246,7 +243,8 @@ end
         'set encoding iso_8859_1', &
         'set size ratio 0 1.0,1.0', &
         ' '
-    write(99, '(8(a,/),a)') &
+    write(99, '(9(a,/),a)') &
+        'FILE = "dat_files/kmesh.dat"', &
         'set xlabel "k_x"', &
         'set ylabel "k_y"', &
         'set xrange [-0.1 : 0.1]', &
@@ -256,29 +254,38 @@ end
         'set mytics 2', &
         'set multiplot', &
         ' '
-!------Sort by angle and radius
-    write(99, '(6(a,/),a)') &
-        '#Connect two rings separately', &
-        'R(x,y) = sqrt(x*x + y*y)', &
-        'theta(x,y) = atan2(y,x)', &
-        'gap = 0.05', &
-        'set style data linespoints', &
-        'set datafile missing NaN', &
-        ' '
 !-----Arrow Colour
-    write(99, '(6(a,/),a)') &
+     write(99, '(6(a,/),a)') &
         '#Palette for arrows', &
         'set palette defined ( 0 "blue", 0.5 "white", 1 "red" )', &
         'set cblabel "m_z"', &
         'set style arrow 1 head filled size screen 0.02,10,45 lt 1 lc palette', &
         ' '
+!------Sort by angle and radius
+    write(99, '(6(a,/),a)') &
+        '#Connect two rings separately', &
+        'theta(x,y) = atan2(y,x)', &
+        'RingX(colX,colY,b) = (x1=column(colX), y1=column(colY), sqrt(x1**2 + y1**2) < 0.04)^b ? \', &
+        '             (f ? (x2=x1,y2=y1):(f=1,x0=x1,y0=y1),$1) : NaN', &
+        'angle(colX,colY)   = theta(column(colY),column(colX))', &
+        'gap = 0.05', &
+        ' '
+    write(99, '(5(a,/),a)') &
+        'set style data linespoints', &
+        'set datafile missing NaN', &
+        'set table $Sorted', &
+        '  plot FILE u 1:2:(theta($2,$1))  smooth zsort', &
+        'unset table', &
+        ' '
 !-----Ring plot
-    write(99, '(4(a,/),a)') &
+    write(99, '(7(a,/),a)') &
         '#Plot two rings', &
-        'plot "kmesh.dat" u (R($1,$2) < gap ? $1 : NaN) : ($2) : (theta($1,$2)) pt 7 ps 0.01 lt 5 lw 7 smooth zsort, \', &
-        '     "kmesh.dat" u (R($1,$2) > gap ? $1 : NaN) : ($2) : (theta($1,$2)) pt 7 ps 0.01 lt 5 lw 7 smooth zsort, \', &
-        '     "kmesh.dat" u 1:2:3:4:5 with vectors arrowstyle 1  #Spin Projection', &
-        '#"kmesh.dat" u 1:2:6:7:8 with vectors arrowstyle 1  #Angular Momentum Projection', &
+        'plot f=0 $Sorted u (RingX(1,2,0)):2:(angle(1,2)) w l ls 1 lt 5 lw 7, \', &
+        '     f=0  "" u (x0):(y0):(x2-x0):(y2-y0) w vec ls 1 lt 5 lw 7 nohead, \', &
+        '          "" u (RingX(1,2,1)):2:(angle(1,2)) w l ls 1 lt 5 lw 7, \', &
+        '     f=0  "" u (x0):(y0):(x2-x0):(y2-y0) w vec ls 1 lt 5 lw 7 nohead, \', &
+        '     FILE u 1:2:3:4:5 with vectors arrowstyle 1  #Spin Projection', &
+        '#FILE u 1:2:6:7:8 with vectors arrowstyle 1  #Angular Momentum Projection', &
         'unset multiplot'
     close(99)
    end subroutine write_plt
