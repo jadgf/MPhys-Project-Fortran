@@ -2,8 +2,8 @@ Program Wannier_band_structure
     Implicit None
 !--------to be midified by the usere
     character(len=80):: prefix="data/BiTeI"
-    real*8,parameter::ef= 4.18903772,ikmax=0.07, tolerance = 0.001, energy_diff = -0.02
-    integer,parameter::nkpath=3,np=100,meshres=100, pre_size = int(10*(meshres**2*tolerance))
+    real*8,parameter::ef= 4.18903772,ikmax=0.14, tolerance = 0.001, energy_diff = 0.32
+    integer,parameter::nkpath=3,np=100,meshres=100, pre_size = int(10*100*(meshres**2*tolerance))
 !------------------------------------------------------
     real*8 kmesh(3,meshres**2), dx, dy, CBM, TVB, m_x, m_y, m_z, L_x, L_y, L_z
     character(len=30)::klabel(nkpath)
@@ -142,10 +142,11 @@ Program Wannier_band_structure
         enddo
         call zheev('V','U',nb,HK,nb,k_ene,work,lwork,rwork,info)
 
-        if((ABS(k_ene(13) - (CBM+energy_diff)).lt.tolerance).or.(ABS(k_ene(14) - (CBM+energy_diff)).lt.tolerance)) then
+        if(k_ene(13).lt.(CBM + energy_diff)) then
             kpoints(:,count) = kvec(:)
             kp_eivec(count,:,:) = Hk(:,:)
             count = count + 1
+            !print *, kvec(:)
         endif
     enddo
     print *, "Number of intersections: ", count-1
@@ -209,7 +210,7 @@ Program Wannier_band_structure
 
             ! Y_lm(1,1) = (sqrt2/2) * (phi_k(2,1) - phi_k(1,1));
             ! Y_lm(2,1) = im * (sqrt2/2) * (phi_k(2,1) + phi_k(1,1));
-            ! Y_lm(3,1) = phi_k(3,1); 
+            ! Y_lm(3,1) = phi_k(3,1);
 
             L_x_comp = matmul(conjg(transpose(Y_lm)),matmul(Lx, Y_lm))
             L_y_comp = matmul(conjg(transpose(Y_lm)),matmul(Ly, Y_lm))
@@ -253,8 +254,8 @@ end
         'FILE = "dat_files/kmesh.dat"', &
         'set xlabel "k_x"', &
         'set ylabel "k_y"', &
-        'set xrange [-0.1 : 0.1]', &
-        'set yrange [ -0.1 : 0.1 ]', &
+        'set xrange [-0.15 : 0.15]', &
+        'set yrange [ -0.15 : 0.15 ]', &
         'unset key', &
         'set ytics 0.05 scale 1 nomirror out', &
         'set mytics 2', &
@@ -289,7 +290,7 @@ end
         '     f=0  "" u (x0):(y0):(x2-x0):(y2-y0) w vec ls 1 lt 5 lw 7 nohead, \', &
         '          "" u (RingX(1,2,1)):2:(angle(1,2)) w l ls 1 lt 5 lw 7, \', &
         '     f=0  "" u (x0):(y0):(x2-x0):(y2-y0) w vec ls 1 lt 5 lw 7 nohead, \', &
-        '     FILE u 1:2:3:4:5 with vectors arrowstyle 1  #Spin Projection', &
+        '     FILE u ($1-$3/2):($2-$4/2):3:4:5 with vectors arrowstyle 1  #Spin Projection', &
         '#FILE u 1:2:6:7:8 with vectors arrowstyle 1  #Angular Momentum Projection', &
         'unset multiplot'
     close(99)
