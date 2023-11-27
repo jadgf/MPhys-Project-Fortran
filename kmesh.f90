@@ -3,7 +3,7 @@ module parameters
 !--------to be midified by the usere
     character(len=80):: prefix="BiTeI"
     real*8,parameter::ef= 4.18903772,kmax=0.2
-    integer,parameter::meshres=50, nkpoints=(2*meshres+1),nbmin=12,nbmax=13
+    integer,parameter::meshres=100, nkpoints=(2*meshres+1),nbmin=12,nbmax=13
     integer nb
 end module parameters
 
@@ -163,15 +163,3 @@ subroutine projections(H,sam,oam)
             enddo
     enddo
 end subroutine projections
-
-! Lx= (/zero,one,zero,one,zero,one,zero,one,zero/)
-! Ly= (/zero,-im,zero,im,zero,-im,zero,im,zero/)
-! Lz= (/one,zero,zero,zero,zero,zero,zero,zero,-one/)
-
-! Lx = Lx*1/sqrt2
-! Ly = Ly*1/sqrt2
-! phi(1,1) = H((k-1)*3+1,ib)
-! phi(2,1) = H((k-1)*3+2,ib)
-! phi(3,1) = H((k-1)*3+3,ib)
-! Y_lm= (/(-sqrt2/2) * (H((k-1)*3+1,ib) + im*phi(2,1) = H((k-1)*3+2,ib)),(sqrt2/2) * (H((k-1)*3+1,ib) - im*phi(2,1) = H((k-1)*3+2,ib)),H((k-1)*3+3,ib)/)
-! oam=oam+matmul(conjg(transpose(Y_lm)),matmul(Lx, Y_lm))
