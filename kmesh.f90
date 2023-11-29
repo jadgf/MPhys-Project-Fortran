@@ -81,13 +81,17 @@ Program Projected_band_structure
     write(100, '(a,i8,a,i10,a)') 'object 3 class array type float rank 1 shape',nbmax-nbmin+1,&
                                     ' item', nkpoints*nkpoints,' data follows'
     write(200, '(a,i8,a,i10,a)') 'object 3 class array type float rank 1 shape',nbmax-nbmin+1,&
-                                    ' item', 3*nkpoints*nkpoints,' data follows'
+                                    ' item', nkpoints*nkpoints,' data follows'
     write(300, '(a,i8,a,i10,a)') 'object 3 class array type float rank 1 shape',nbmax-nbmin+1,&
-                                    ' item', 3*nkpoints*nkpoints,' data follows'
+                                    ' item', nkpoints*nkpoints,' data follows'
 
-!----- Perform fourier transform
+                            
+!----- Perform Fourier transform
     allocate(sam(3,nbmin:nbmax), oam(3,nbmin:nbmax), k_ene(nb))
-
+                           
+    dx = kmax / meshres
+    dy = kmax / meshres
+                           
     do ikx=-meshres,meshres
         do iky=-meshres,meshres
             kpoint(1)= ikx*dx
@@ -106,8 +110,8 @@ Program Projected_band_structure
             call zheev('V','U',nb,HK,nb,k_ene,work,lwork,rwork,info)
             call projections(HK,sam,oam)
             write(100, '(2(1x,f12.6))') k_ene(nbmin), k_ene(nbmax)
-            write(200, '(6(1x,f12.6))') sam(:,nbmin), sam(:,nbmax)
-            write(300, '(6(1x,f12.6))') oam(:,nbmin), oam(:,nbmax)
+            write(200, '(6(1x,f12.6))') sam(:,nbmin)!sam(:,nbmax)
+            write(300, '(6(1x,f12.6))') oam(:,nbmin)!oam(:,nbmax)
         enddo
     enddo
     write(100,'(A,/,A,/,A,/,A)') &
@@ -141,11 +145,11 @@ subroutine projections(H,sam,oam)
    !-Define Pauli matrices
    
     data pauli_x / (0d0,0d0),(1d0, 0d0),(1d0,0d0),( 0d0,0d0)/
-    data pauli_y / (0d0,0d0),(0d0,-1d0),(0d0,1d0),( 0d0,0d0)/
+    data pauli_y / (0d0,0d0),(0d0,1d0),(0d0,-1d0),( 0d0,0d0)/
     data pauli_z / (1d0,0d0),(0d0, 0d0),(0d0,0d0),(-1d0,0d0)/
-    data Lhat_x / (0d0,0d0),(1d0, 0d0),(0d0,0d0),(1d0, 0d0),(0d0,0d0),(1d0,0d0),(0d0,0d0),(1d0, 0d0),( 0d0,0d0)/     
-    data Lhat_y / (0d0,0d0),(0d0, 1d0),(0d0,0d0),(0d0,-1d0),(0d0,0d0),(0d0,1d0),(0d0,0d0),(0d0,-1d0),( 0d0,0d0)/     
-    data Lhat_z / (1d0,0d0),(0d0, 0d0),(0d0,0d0),(0d0, 0d0),(0d0,0d0),(0d0,0d0),(0d0,0d0),(0d0, 0d0),(-1d0,0d0)/     
+    data Lhat_x / (0d0,0d0),(1d0, 0d0),(0d0,0d0),(1d0,0d0),(0d0,0d0),(1d0, 0d0),(0d0,0d0),(1d0,0d0),( 0d0,0d0)/     
+    data Lhat_y / (0d0,0d0),(0d0,-1d0),(0d0,0d0),(0d0,1d0),(0d0,0d0),(0d0,-1d0),(0d0,0d0),(0d0,1d0),( 0d0,0d0)/     
+    data Lhat_z / (1d0,0d0),(0d0, 0d0),(0d0,0d0),(0d0,0d0),(0d0,0d0),(0d0, 0d0),(0d0,0d0),(0d0,0d0),(-1d0,0d0)/     
 
     sam=0d0 
     oam=0d0

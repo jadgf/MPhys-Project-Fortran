@@ -1,37 +1,23 @@
 //
-// time: Wed Nov 29 13:44:17 2023
+// time: Wed Nov 29 15:44:35 2023
 //
 // version: 3.2.0 (format), 4.4.4 (DX)
 //
 //
 // MODULE main
-// workspace: width = 499, height = 665
+// workspace: width = 448, height = 746
 // layout: snap = 0, width = 50, height = 50, align = NN
 //
 macro main(
 ) -> (
 ) {
     // 
-    // node AutoGlyph[1]: x = 239, y = 464, inputs = 7, label = AutoGlyph
-    // input[2]: defaulting = 0, visible = 1, type = 32, value = "arrow"
-    //
-main_AutoGlyph_1_out_1 = 
-    AutoGlyph(
-    main_AutoGlyph_1_in_1,
-    main_AutoGlyph_1_in_2,
-    main_AutoGlyph_1_in_3,
-    main_AutoGlyph_1_in_4,
-    main_AutoGlyph_1_in_5,
-    main_AutoGlyph_1_in_6,
-    main_AutoGlyph_1_in_7
-    ) [instance: 1, cache: 1];
-    // 
-    // node FileSelector[1]: x = 216, y = 53, inputs = 0, label = FileSelector
+    // node FileSelector[1]: x = 302, y = 90, inputs = 0, label = FileSelector
     // output[1]: visible = 1, type = 32, value = "/home/felix/Desktop/MPhys-Project-Fortran/oam.dx"
     // output[2]: visible = 1, type = 32, value = "oam.dx"
     //
     // 
-    // node Import[1]: x = 284, y = 141, inputs = 6, label = Import
+    // node Import[1]: x = 309, y = 199, inputs = 6, label = Import
     // input[1]: defaulting = 1, visible = 1, type = 32, value = NULL
     //
 main_Import_1_out_1 = 
@@ -44,36 +30,89 @@ main_Import_1_out_1 =
     main_Import_1_in_6
     ) [instance: 1, cache: 1];
     // 
-    // node Compute[6]: x = 238, y = 261, inputs = 3, label = Compute
-    // input[1]: defaulting = 0, visible = 0, type = 32, value = ""
-    // expression: value = 
+    // node Compute[3]: x = 221, y = 274, inputs = 3, label = Compute
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "select($0,2)"
+    // expression: value = select(a,2)
     // name[2]: value = a
     // name[3]: value = b
     //
-main_Compute_6_out_1 = 
+main_Compute_3_out_1 = 
     Compute(
-    main_Compute_6_in_1,
+    main_Compute_3_in_1,
     main_Import_1_out_1,
-    main_Compute_6_in_3
-    ) [instance: 6, cache: 1];
+    main_Compute_3_in_3
+    ) [instance: 3, cache: 1];
     // 
-    // node Image[1]: x = 216, y = 603, inputs = 49, label = Image
+    // node AutoColor[1]: x = 147, y = 372, inputs = 10, label = AutoColor
+    //
+main_AutoColor_1_out_1,
+main_AutoColor_1_out_2 = 
+    AutoColor(
+    main_Compute_3_out_1,
+    main_AutoColor_1_in_2,
+    main_AutoColor_1_in_3,
+    main_AutoColor_1_in_4,
+    main_AutoColor_1_in_5,
+    main_AutoColor_1_in_6,
+    main_AutoColor_1_in_7,
+    main_AutoColor_1_in_8,
+    main_AutoColor_1_in_9,
+    main_AutoColor_1_in_10
+    ) [instance: 1, cache: 1];
+    // 
+    // node Compute[4]: x = 379, y = 297, inputs = 3, label = Compute
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "[$0.0,$0.1]"
+    // expression: value = [a.0,a.1]
+    // name[2]: value = a
+    // name[3]: value = b
+    //
+main_Compute_4_out_1 = 
+    Compute(
+    main_Compute_4_in_1,
+    main_Import_1_out_1,
+    main_Compute_4_in_3
+    ) [instance: 4, cache: 1];
+    // 
+    // node Collect[1]: x = 318, y = 415, inputs = 2, label = Collect
+    //
+main_Collect_1_out_1 = 
+    Collect(
+    main_AutoColor_1_out_1,
+    main_Compute_4_out_1
+    ) [instance: 1, cache: 1];
+    // 
+    // node AutoGlyph[1]: x = 260, y = 517, inputs = 7, label = AutoGlyph
+    // input[2]: defaulting = 1, visible = 1, type = 32, value = "arrow"
+    // input[4]: defaulting = 0, visible = 1, type = 5, value = 0.6
+    //
+main_AutoGlyph_1_out_1 = 
+    AutoGlyph(
+    main_Collect_1_out_1,
+    main_AutoGlyph_1_in_2,
+    main_AutoGlyph_1_in_3,
+    main_AutoGlyph_1_in_4,
+    main_AutoGlyph_1_in_5,
+    main_AutoGlyph_1_in_6,
+    main_AutoGlyph_1_in_7
+    ) [instance: 1, cache: 1];
+    // 
+    // node Image[1]: x = 286, y = 684, inputs = 49, label = Image
     // input[1]: defaulting = 0, visible = 0, type = 67108863, value = "Image_1"
     // input[4]: defaulting = 0, visible = 0, type = 1, value = 1
     // input[5]: defaulting = 0, visible = 0, type = 8, value = [0 0 0]
-    // input[6]: defaulting = 0, visible = 0, type = 8, value = [0 0 0]
-    // input[7]: defaulting = 0, visible = 0, type = 5, value = 0.508135
-    // input[8]: defaulting = 0, visible = 0, type = 1, value = 640
-    // input[9]: defaulting = 0, visible = 0, type = 5, value = 0.836719
+    // input[6]: defaulting = 0, visible = 0, type = 8, value = [0 0 8.66023]
+    // input[7]: defaulting = 0, visible = 0, type = 5, value = 0.0654131
+    // input[8]: defaulting = 0, visible = 0, type = 1, value = 1906
+    // input[9]: defaulting = 0, visible = 0, type = 5, value = 0.507
     // input[10]: defaulting = 0, visible = 0, type = 8, value = [0 1 0]
-    // input[11]: defaulting = 1, visible = 0, type = 5, value = 27.5
+    // input[11]: defaulting = 1, visible = 0, type = 5, value = 0.432769
     // input[12]: defaulting = 0, visible = 0, type = 1, value = 0
     // input[14]: defaulting = 0, visible = 0, type = 1, value = 1
     // input[15]: defaulting = 1, visible = 0, type = 32, value = "none"
     // input[16]: defaulting = 1, visible = 0, type = 32, value = "none"
     // input[17]: defaulting = 1, visible = 0, type = 1, value = 1
     // input[18]: defaulting = 1, visible = 0, type = 1, value = 1
-    // input[19]: defaulting = 0, visible = 0, type = 3, value = 0
+    // input[19]: defaulting = 0, visible = 0, type = 1, value = 0
     // input[29]: defaulting = 0, visible = 0, type = 3, value = 1
     // input[30]: defaulting = 0, visible = 0, type = 16777248, value = {"kx", "ky", ""}
     // input[32]: defaulting = 0, visible = 0, type = 16777224, value = {[-0.2 -0.2 0] [0.2 0.2 0]}
@@ -81,7 +120,7 @@ main_Compute_6_out_1 =
     // input[38]: defaulting = 0, visible = 0, type = 16777248, value = {"background", "grid", "ticks", "labels"}
     // input[41]: defaulting = 0, visible = 0, type = 32, value = "zoom"
     // depth: value = 24
-    // window: position = (0.4526,0.2204), size = 0.3406x0.5343
+    // window: position = (0.0052,0.0398), size = 1.0000x0.9333
     // internal caching: 1
     //
 main_Image_1_out_1,
@@ -138,25 +177,9 @@ main_Image_1_out_3 =
     main_Image_1_in_48,
     main_Image_1_in_49
     ) [instance: 1, cache: 1];
-    // 
-    // node Mark[1]: x = 451, y = 332, inputs = 2, label = Mark
-    //
-main_Mark_1_out_1 = 
-    Mark(
-    main_Mark_1_in_1,
-    main_Mark_1_in_2
-    ) [instance: 1, cache: 1];
 // network: end of macro body
 CacheScene(main_Image_1_in_1, main_Image_1_out_1, main_Image_1_out_2);
 }
-main_AutoGlyph_1_in_1 = NULL;
-main_AutoGlyph_1_in_2 = "arrow";
-main_AutoGlyph_1_in_3 = NULL;
-main_AutoGlyph_1_in_4 = NULL;
-main_AutoGlyph_1_in_5 = NULL;
-main_AutoGlyph_1_in_6 = NULL;
-main_AutoGlyph_1_in_7 = NULL;
-main_AutoGlyph_1_out_1 = NULL;
 main_FileSelector_1_out_1 = "/home/felix/Desktop/MPhys-Project-Fortran/oam.dx";
 main_Import_1_in_2 = NULL;
 main_Import_1_in_3 = NULL;
@@ -164,8 +187,30 @@ main_Import_1_in_4 = NULL;
 main_Import_1_in_5 = NULL;
 main_Import_1_in_6 = NULL;
 main_Import_1_out_1 = NULL;
-main_Compute_6_in_1 = "";
-main_Compute_6_in_3 = NULL;
+main_Compute_3_in_1 = "select($0,2)";
+main_Compute_3_in_3 = NULL;
+main_Compute_3_out_1 = NULL;
+main_AutoColor_1_in_2 = NULL;
+main_AutoColor_1_in_3 = NULL;
+main_AutoColor_1_in_4 = NULL;
+main_AutoColor_1_in_5 = NULL;
+main_AutoColor_1_in_6 = NULL;
+main_AutoColor_1_in_7 = NULL;
+main_AutoColor_1_in_8 = NULL;
+main_AutoColor_1_in_9 = NULL;
+main_AutoColor_1_in_10 = NULL;
+main_AutoColor_1_out_1 = NULL;
+main_Compute_4_in_1 = "[$0.0,$0.1]";
+main_Compute_4_in_3 = NULL;
+main_Compute_4_out_1 = NULL;
+main_Collect_1_out_1 = NULL;
+main_AutoGlyph_1_in_2 = NULL;
+main_AutoGlyph_1_in_3 = NULL;
+main_AutoGlyph_1_in_4 = 0.6;
+main_AutoGlyph_1_in_5 = NULL;
+main_AutoGlyph_1_in_6 = NULL;
+main_AutoGlyph_1_in_7 = NULL;
+main_AutoGlyph_1_out_1 = NULL;
 macro Image(
         id,
         object,
@@ -482,10 +527,10 @@ main_Image_1_in_1 = "Image_1";
 main_Image_1_in_3 = "X24,,";
 main_Image_1_in_4 = 1;
 main_Image_1_in_5 = [0 0 0];
-main_Image_1_in_6 = [0 0 0];
-main_Image_1_in_7 = 0.508135;
-main_Image_1_in_8 = 640;
-main_Image_1_in_9 = 0.836719;
+main_Image_1_in_6 = [0 0 8.66023];
+main_Image_1_in_7 = 0.0654131;
+main_Image_1_in_8 = 1906;
+main_Image_1_in_9 = 0.507;
 main_Image_1_in_10 = [0 1 0];
 main_Image_1_in_11 = NULL;
 main_Image_1_in_12 = 0;
@@ -525,8 +570,6 @@ main_Image_1_in_46 = NULL;
 main_Image_1_in_47 = NULL;
 main_Image_1_in_48 = NULL;
 main_Image_1_in_49 = NULL;
-main_Mark_1_in_1 = NULL;
-main_Mark_1_in_2 = NULL;
 Executive("product version 4 4 4");
 $sync
 main();
