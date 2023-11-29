@@ -134,7 +134,7 @@ subroutine projections(H,sam,oam)
     use parameters
     Implicit None
     complex*16 H(nb,nb),chi(2,1),phi(3)
-    real*8 sam(3),oam(3),sx(1,1),sy(1,1),sz(1,1),lx(1,1),ly(1,1),lz(1,1)
+    real*8 sam(3,nbmin:nbmax),oam(3,nbmin:nbmax),sx(1,1),sy(1,1),sz(1,1),lx(1,1),ly(1,1),lz(1,1)
     complex*8 pauli_x(2, 2), pauli_y(2, 2), pauli_z(2, 2), Lhat_x(3,3), Lhat_y(3,3), Lhat_z(3,3), Y_lm(3,1)
     integer ib,jb,orbital_index
 !-----Spin projection
@@ -158,9 +158,9 @@ subroutine projections(H,sam,oam)
                 sx = matmul(conjg(transpose(chi)),matmul(pauli_x, chi))
                 sy = matmul(conjg(transpose(chi)),matmul(pauli_y, chi))
                 sz = matmul(conjg(transpose(chi)),matmul(pauli_z, chi))
-                sam(1)=sam(1)+sx(1,1)
-                sam(2)=sam(2)+sy(1,1)
-                sam(3)=sam(3)+sz(1,1)
+                sam(1,ib)=sam(1,ib)+sx(1,1)
+                sam(2,ib)=sam(2,ib)+sy(1,1)
+                sam(3,ib)=sam(3,ib)+sz(1,1)
            
             enddo
             do jb=0,nb/3-1
@@ -175,9 +175,9 @@ subroutine projections(H,sam,oam)
                 lx = matmul(conjg(transpose(Y_lm)),matmul(Lhat_x, Y_lm))
                 ly = matmul(conjg(transpose(Y_lm)),matmul(Lhat_y, Y_lm))
                 lz = matmul(conjg(transpose(Y_lm)),matmul(Lhat_z, Y_lm))
-                oam(1)=oam(1)+lx(1,1)
-                oam(2)=oam(2)+ly(1,1)
-                oam(3)=oam(3)+lz(1,1)
+                oam(1,ib)=oam(1,ib)+lx(1,1)
+                oam(2,ib)=oam(2,ib)+ly(1,1)
+                oam(3,ib)=oam(3,ib)+lz(1,1)
                                                                         
             enddo
     enddo
