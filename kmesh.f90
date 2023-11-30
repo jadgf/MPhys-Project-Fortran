@@ -80,9 +80,9 @@ Program Projected_band_structure
     write(300, '(a,2(1x,i8))') 'object 2 class gridconnections counts',nkpoints,nkpoints
     write(100, '(a,i8,a,i10,a)') 'object 3 class array type float rank 1 shape',nbmax-nbmin+1,&
                                     ' item', nkpoints*nkpoints,' data follows'
-    write(200, '(a,i8,a,i10,a)') 'object 3 class array type float rank 1 shape',nbmax-nbmin+1,&
+    write(200, '(a,a,i10,a)') 'object 3 class array type float rank 1 shape 3',&
                                     ' item', nkpoints*nkpoints,' data follows'
-    write(300, '(a,i8,a,i10,a)') 'object 3 class array type float rank 1 shape',nbmax-nbmin+1,&
+    write(300, '(a,a,i10,a)') 'object 3 class array type float rank 1 shape 3',&
                                     ' item', nkpoints*nkpoints,' data follows'
 
                             
@@ -144,12 +144,12 @@ subroutine projections(H,sam,oam)
 !-----Spin projection
    !-Define Pauli matrices
    
-    data pauli_x / (0d0,0d0),(1d0, 0d0),(1d0,0d0),( 0d0,0d0)/
-    data pauli_y / (0d0,0d0),(0d0,1d0),(0d0,-1d0),( 0d0,0d0)/
-    data pauli_z / (1d0,0d0),(0d0, 0d0),(0d0,0d0),(-1d0,0d0)/
-    data Lhat_x / (0d0,0d0),(1d0, 0d0),(0d0,0d0),(1d0,0d0),(0d0,0d0),(1d0, 0d0),(0d0,0d0),(1d0,0d0),( 0d0,0d0)/     
-    data Lhat_y / (0d0,0d0),(0d0,-1d0),(0d0,0d0),(0d0,1d0),(0d0,0d0),(0d0,-1d0),(0d0,0d0),(0d0,1d0),( 0d0,0d0)/     
-    data Lhat_z / (1d0,0d0),(0d0, 0d0),(0d0,0d0),(0d0,0d0),(0d0,0d0),(0d0, 0d0),(0d0,0d0),(0d0,0d0),(-1d0,0d0)/     
+    data pauli_x / (0d0,0d0),(1d0,0d0),(1d0, 0d0),( 0d0, 0d0)/
+    data pauli_y / (0d0,0d0),(0d0,1d0),(0d0,-1d0),( 0d0, 0d0)/
+    data pauli_z / (1d0,0d0),(0d0,0d0),(0d0, 0d0),(-1d0, 0d0)/
+    data Lhat_x /  (0d0,0d0),(1d0,0d0),(0d0, 0d0),( 1d0, 0d0),(0d0,0d0),(1d0,0d0),(0d0,0d0),(1d0, 0d0),( 0d0,0d0)/     
+    data Lhat_y /  (0d0,0d0),(0d0,1d0),(0d0, 0d0),( 0d0,-1d0),(0d0,0d0),(0d0,1d0),(0d0,0d0),(0d0,-1d0),( 0d0,0d0)/     
+    data Lhat_z /  (1d0,0d0),(0d0,0d0),(0d0, 0d0),( 0d0, 0d0),(0d0,0d0),(0d0,0d0),(0d0,0d0),(0d0, 0d0),(-1d0,0d0)/     
 
     sam=0d0 
     oam=0d0
@@ -175,9 +175,9 @@ subroutine projections(H,sam,oam)
                 Y_lm(1,1) = (-1/sqrt2) * (phi(1) + dcmplx(0,1)*phi(2))
                 Y_lm(2,1) = ( 1/sqrt2) * (phi(1) - dcmplx(0,1)*phi(2))
                 Y_lm(3,1) = phi(3)
-              
-                lx = matmul(conjg(transpose(Y_lm)),matmul(Lhat_x, Y_lm))
-                ly = matmul(conjg(transpose(Y_lm)),matmul(Lhat_y, Y_lm))
+                
+                lx = matmul(conjg(transpose(Y_lm)),matmul((1/sqrt2)*Lhat_x, Y_lm))
+                ly = matmul(conjg(transpose(Y_lm)),matmul((1/sqrt2)*Lhat_y, Y_lm))
                 lz = matmul(conjg(transpose(Y_lm)),matmul(Lhat_z, Y_lm))
                 oam(1,ib)=oam(1,ib)+lx(1,1)
                 oam(2,ib)=oam(2,ib)+ly(1,1)
