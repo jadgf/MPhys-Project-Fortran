@@ -3,7 +3,7 @@ module parameters
 !--------to be midified by the usere
     character(len=80):: prefix="BiTeI"
     real*8,parameter::ef= 4.18903772,kmax=0.2,two=2.0d0,sqrt2=sqrt(two)
-    integer,parameter::meshres=100, nkpoints=(2*meshres+1),nbmin=13,nbmax=14
+    integer,parameter::meshres=100, nkpoints=(2*meshres+1),nbmin=11,nbmax=14
     integer nb
 end module parameters
 
@@ -167,14 +167,13 @@ subroutine projections(H,sam,oam)
                 sam(3,ib)=sam(3,ib)+sz(1,1)
            
             enddo
-            do jb=0,nb/3-1
-                orbital_index=3*jb
-                phi(1) = H(orbital_index+1,ib) 
-                phi(2) = H(orbital_index+2,ib)
-                phi(3) = H(orbital_index+3,ib)                               
-                Y_lm(1,1) = (-1/sqrt2) * (phi(1) + dcmplx(0,1)*phi(2))
-                Y_lm(2,1) = ( 1/sqrt2) * (phi(1) - dcmplx(0,1)*phi(2))
-                Y_lm(3,1) = phi(3)
+            do jb=1,nb,3
+                phi(1) = H(jb  ,ib) 
+                phi(2) = H(jb+1,ib)
+                phi(3) = H(jb+2,ib)                               
+                Y_lm(3,1) = (-1/sqrt2) * (phi(1) + dcmplx(0,1)*phi(2))
+                Y_lm(1,1) = ( 1/sqrt2) * (phi(1) - dcmplx(0,1)*phi(2))
+                Y_lm(2,1) = phi(3)
                 
                 lx = matmul(conjg(transpose(Y_lm)),matmul((1/sqrt2)*Lhat_x, Y_lm))
                 ly = matmul(conjg(transpose(Y_lm)),matmul((1/sqrt2)*Lhat_y, Y_lm))
