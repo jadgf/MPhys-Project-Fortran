@@ -1,5 +1,5 @@
 //
-// time: Thu Nov 30 10:27:06 2023
+// time: Thu Nov 30 11:20:28 2023
 //
 // version: 3.2.0 (format), 4.4.4 (DX)
 //
@@ -13,11 +13,11 @@ macro main(
 ) {
     // 
     // node FileSelector[1]: x = 244, y = 106, inputs = 0, label = FileSelector
-    // output[1]: visible = 1, type = 32, value = "/home/felix/Desktop/MPhys-Project-Fortran/sam.dx"
-    // output[2]: visible = 1, type = 32, value = "sam.dx"
+    // output[1]: visible = 1, type = 32, value = "/Users/James/Documents/GitHub/MPhys-Project-Fortran/oam.dx"
+    // output[2]: visible = 1, type = 32, value = "oam.dx"
     //
     // 
-    // node Import[1]: x = 235, y = 217, inputs = 6, label = Import
+    // node Import[1]: x = 186, y = 232, inputs = 6, label = Import
     //
 main_Import_1_out_1 = 
     Import(
@@ -29,9 +29,19 @@ main_Import_1_out_1 =
     main_Import_1_in_6
     ) [instance: 1, cache: 1];
     // 
+    // node Scalar[1]: x = 296, y = 211, inputs = 11, label = Scalar
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "Scalar_1"
+    // input[3]: defaulting = 0, visible = 0, type = 5, value = 1.0 
+    // input[5]: defaulting = 1, visible = 0, type = 5, value = -1000000.0
+    // input[6]: defaulting = 1, visible = 0, type = 5, value = 1000000.0
+    // input[7]: defaulting = 1, visible = 0, type = 5, value = 1.0
+    // input[9]: defaulting = 1, visible = 0, type = 1, value = 5
+    // output[1]: visible = 1, type = 5, value = 1.0 
+    //
+    // 
     // node Compute[2]: x = 464, y = 177, inputs = 3, label = Compute
-    // input[1]: defaulting = 0, visible = 0, type = 32, value = "[$0.2]"
-    // expression: value = [a.2]
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "[$0.2+$1*3]"
+    // expression: value = [a.2+b*3]
     // name[2]: value = a
     // name[3]: value = b
     //
@@ -39,7 +49,7 @@ main_Compute_2_out_1 =
     Compute(
     main_Compute_2_in_1,
     main_Import_1_out_1,
-    main_Compute_2_in_3
+    main_Scalar_1_out_1
     ) [instance: 2, cache: 1];
     // 
     // node AutoColor[2]: x = 474, y = 252, inputs = 10, label = AutoColor
@@ -62,8 +72,8 @@ main_AutoColor_2_out_2 =
     ) [instance: 2, cache: 1];
     // 
     // node Compute[1]: x = 305, y = 304, inputs = 3, label = Compute
-    // input[1]: defaulting = 0, visible = 0, type = 32, value = "[$0.0,$0.1]"
-    // expression: value = [a.0,a.1]
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "[$0.0+$1*3,$0.1+$1*3]"
+    // expression: value = [a.0+b*3,a.1+b*3]
     // name[2]: value = a
     // name[3]: value = b
     //
@@ -71,7 +81,7 @@ main_Compute_1_out_1 =
     Compute(
     main_Compute_1_in_1,
     main_Import_1_out_1,
-    main_Compute_1_in_3
+    main_Scalar_1_out_1
     ) [instance: 1, cache: 1];
     // 
     // node Replace[1]: x = 424, y = 383, inputs = 4, label = Replace
@@ -147,11 +157,11 @@ main_Collect_1_out_1 =
     // input[4]: defaulting = 0, visible = 0, type = 1, value = 1
     // input[5]: defaulting = 0, visible = 0, type = 8, value = [4.91738e-07 -1.19209e-07 0]
     // input[6]: defaulting = 0, visible = 0, type = 8, value = [4.91738e-07 -1.19209e-07 2.20606]
-    // input[7]: defaulting = 1, visible = 0, type = 5, value = 1.18414
-    // input[8]: defaulting = 0, visible = 0, type = 1, value = 1906
-    // input[9]: defaulting = 0, visible = 0, type = 5, value = 0.507
+    // input[7]: defaulting = 1, visible = 0, type = 5, value = 1.67191
+    // input[8]: defaulting = 0, visible = 0, type = 1, value = 1456
+    // input[9]: defaulting = 0, visible = 0, type = 5, value = 0.569
     // input[10]: defaulting = 0, visible = 0, type = 8, value = [0 1 0]
-    // input[11]: defaulting = 0, visible = 0, type = 5, value = 30.0464
+    // input[11]: defaulting = 0, visible = 0, type = 5, value = 41.5069
     // input[12]: defaulting = 0, visible = 0, type = 1, value = 1
     // input[14]: defaulting = 0, visible = 0, type = 1, value = 1
     // input[15]: defaulting = 1, visible = 0, type = 32, value = "none"
@@ -166,10 +176,10 @@ main_Collect_1_out_1 =
     // input[32]: defaulting = 0, visible = 0, type = 16777224, value = {[-0.2 -0.2 0] [0.2 0.2 0]}
     // input[33]: defaulting = 0, visible = 0, type = 3, value = 1
     // input[37]: defaulting = 0, visible = 0, type = 16777248, value = {"clear", "grey5", "black", "black"}
-    // input[38]: defaulting = 0, visible = 0, type = 16777248, value = {"background","grid","ticks","labels"}
+    // input[38]: defaulting = 0, visible = 0, type = 16777248, value = {"background", "grid", "ticks", "labels"}
     // input[41]: defaulting = 0, visible = 0, type = 32, value = "zoom"
     // depth: value = 24
-    // window: position = (0.0000,0.0324), size = 1.0000x0.9333
+    // window: position = (0.0068,0.1030), size = 1.0000x0.9335, screen = 0
     // internal caching: 1
     //
 main_Image_1_out_1,
@@ -229,15 +239,26 @@ main_Image_1_out_3 =
 // network: end of macro body
 CacheScene(main_Image_1_in_1, main_Image_1_out_1, main_Image_1_out_2);
 }
-main_FileSelector_1_out_1 = "/home/felix/Desktop/MPhys-Project-Fortran/sam.dx";
+main_FileSelector_1_out_1 = "/Users/James/Documents/GitHub/MPhys-Project-Fortran/oam.dx";
 main_Import_1_in_2 = NULL;
 main_Import_1_in_3 = NULL;
 main_Import_1_in_4 = NULL;
 main_Import_1_in_5 = NULL;
 main_Import_1_in_6 = NULL;
 main_Import_1_out_1 = NULL;
-main_Compute_2_in_1 = "[$0.2]";
-main_Compute_2_in_3 = NULL;
+main_Scalar_1_in_1 = "Scalar_1";
+main_Scalar_1_in_2 = NULL;
+main_Scalar_1_in_3 = 1.0 ;
+main_Scalar_1_in_4 = NULL;
+main_Scalar_1_in_5 = NULL;
+main_Scalar_1_in_6 = NULL;
+main_Scalar_1_in_7 = NULL;
+main_Scalar_1_in_8 = NULL;
+main_Scalar_1_in_9 = NULL;
+main_Scalar_1_in_10 = NULL;
+main_Scalar_1_in_11 = NULL;
+main_Scalar_1_out_1 = 1.0 ;
+main_Compute_2_in_1 = "[$0.2+$1*3]";
 main_Compute_2_out_1 = NULL;
 main_AutoColor_2_in_2 = NULL;
 main_AutoColor_2_in_3 = NULL;
@@ -250,8 +271,7 @@ main_AutoColor_2_in_9 = NULL;
 main_AutoColor_2_in_10 = NULL;
 main_AutoColor_2_out_1 = NULL;
 main_AutoColor_2_out_2 = NULL;
-main_Compute_1_in_1 = "[$0.0,$0.1]";
-main_Compute_1_in_3 = NULL;
+main_Compute_1_in_1 = "[$0.0+$1*3,$0.1+$1*3]";
 main_Compute_1_out_1 = NULL;
 main_Replace_1_in_3 = "colors";
 main_Replace_1_in_4 = "colors";
@@ -600,10 +620,10 @@ main_Image_1_in_4 = 1;
 main_Image_1_in_5 = [4.91738e-07 -1.19209e-07 0];
 main_Image_1_in_6 = [4.91738e-07 -1.19209e-07 2.20606];
 main_Image_1_in_7 = NULL;
-main_Image_1_in_8 = 1906;
-main_Image_1_in_9 = 0.507;
+main_Image_1_in_8 = 1456;
+main_Image_1_in_9 = 0.569;
 main_Image_1_in_10 = [0 1 0];
-main_Image_1_in_11 = 30.0464;
+main_Image_1_in_11 = 41.5069;
 main_Image_1_in_12 = 1;
 main_Image_1_in_13 = NULL;
 main_Image_1_in_14 = 1;
@@ -629,7 +649,7 @@ main_Image_1_in_34 = NULL;
 main_Image_1_in_35 = NULL;
 main_Image_1_in_36 = NULL;
 main_Image_1_in_37 = {"clear", "grey5", "black", "black"};
-main_Image_1_in_38 = {"background","grid","ticks","labels"};
+main_Image_1_in_38 = {"background", "grid", "ticks", "labels"};
 main_Image_1_in_39 = NULL;
 main_Image_1_in_40 = NULL;
 main_Image_1_in_41 = "zoom";

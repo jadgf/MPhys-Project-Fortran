@@ -80,9 +80,9 @@ Program Projected_band_structure
     write(300, '(a,2(1x,i8))') 'object 2 class gridconnections counts',nkpoints,nkpoints
     write(100, '(a,i8,a,i10,a)') 'object 3 class array type float rank 1 shape',nbmax-nbmin+1,&
                                     ' item', nkpoints*nkpoints,' data follows'
-    write(200, '(a,a,i10,a)') 'object 3 class array type float rank 1 shape 3',&
+    write(200, '(a,a,i10,a)') 'object 3 class array type float rank 1 shape 6',&
                                     ' item', nkpoints*nkpoints,' data follows'
-    write(300, '(a,a,i10,a)') 'object 3 class array type float rank 1 shape 3',&
+    write(300, '(a,a,i10,a)') 'object 3 class array type float rank 1 shape 6',&
                                     ' item', nkpoints*nkpoints,' data follows'
 
                             
@@ -110,8 +110,8 @@ Program Projected_band_structure
             call zheev('V','U',nb,HK,nb,k_ene,work,lwork,rwork,info)
             call projections(HK,sam,oam)
             write(100, '(2(1x,f12.6))') k_ene(nbmin), k_ene(nbmax)
-            write(200, '(6(1x,f12.6))') sam(:,nbmin)!sam(:,nbmax)
-            write(300, '(6(1x,f12.6))') oam(:,nbmin)!oam(:,nbmax)
+            write(200, '(6(1x,f12.6))') sam(:,nbmin), sam(:,nbmax)
+            write(300, '(6(1x,f12.6))') oam(:,nbmin), oam(:,nbmax)
         enddo
     enddo
     write(100,'(A,/,A,/,A,/,A)') &
