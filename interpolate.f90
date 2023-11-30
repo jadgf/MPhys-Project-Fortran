@@ -67,7 +67,7 @@ Program Projected_band_structure
     dy = kmax / meshres
     
 !----- Create header of dx files
-    write(100, '(a,2(1x,i8))') 'object 1 class gridpoints counts',nkpoints,nkpoints
+    write(100, '(a,2(1x,i8))') 'object 1 class gridpositions counts',nkpoints,nkpoints
     write(100, '(a,2(1x,f12.6))') 'origin',-kmax,-kmax
     write(100, '(a,2(1x,f12.6))') 'delta',dx,0d0
     write(100, '(a,2(1x,f12.6))') 'delta',0d0,dy
@@ -80,8 +80,8 @@ Program Projected_band_structure
 
     do ikx=-meshres,meshres
         do iky=-meshres,meshres
-            kpoint(1)= ikx*dx/meshres
-            kpoint(2)= iky*dy/meshres
+            kpoint(1)= ikx*dx
+            kpoint(2)= iky*dy
             kpoint(3)= 0.5d0*bvec(3,3)
 
             HK=(0d0,0d0)
