@@ -1,11 +1,11 @@
 //
-// time: Mon Nov 27 16:30:03 2023
+// time: Tue Nov 28 22:04:28 2023
 //
 // version: 3.2.0 (format), 4.4.4 (DX)
 //
 //
 // MODULE main
-// workspace: width = 739, height = 718
+// workspace: width = 751, height = 721
 // layout: snap = 0, width = 50, height = 50, align = NN
 //
 macro main(
@@ -13,7 +13,7 @@ macro main(
 ) {
     // 
     // node FileSelector[2]: x = 101, y = 47, inputs = 0, label = FileSelector
-    // output[1]: visible = 1, type = 32, value = "./energy.dx"
+    // output[1]: visible = 1, type = 32, value = "/Users/James/Documents/GitHub/MPhys-Project-Fortran/energy.dx"
     // output[2]: visible = 1, type = 32, value = "energy.dx"
     //
     // 
@@ -99,8 +99,8 @@ main_Mark_1_out_1 =
     ) [instance: 1, cache: 1];
     // 
     // node Compute[2]: x = 324, y = 465, inputs = 3, label = Compute
-    // input[1]: defaulting = 0, visible = 0, type = 32, value = "[$0.0,$0.1,$1*10]"
-    // expression: value = [a.0,a.1,b*10]
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "[$0.0,$0.1,$1]"
+    // expression: value = [a.0,a.1,b]
     // name[2]: value = a
     // name[3]: value = b
     //
@@ -129,8 +129,8 @@ main_Mark_2_out_1 =
     ) [instance: 2, cache: 1];
     // 
     // node Compute[4]: x = 667, y = 463, inputs = 3, label = Compute
-    // input[1]: defaulting = 0, visible = 0, type = 32, value = "[$0.0,$0.1,$1*10]"
-    // expression: value = [a.0,a.1,b*10]
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "[$0.0,$0.1,$1]"
+    // expression: value = [a.0,a.1,b]
     // name[2]: value = a
     // name[3]: value = b
     //
@@ -157,11 +157,6 @@ main_Collect_1_out_1 =
     main_Unmark_2_out_1
     ) [instance: 1, cache: 1];
     // 
-    // node FileSelector[1]: x = 398, y = 41, inputs = 0, label = FileSelector
-    // output[1]: visible = 1, type = 32, value = "./energy.dat"
-    // output[2]: visible = 1, type = 32, value = "energy.dat"
-    //
-    // 
     // node Shade[1]: x = 185, y = 526, inputs = 8, label = Shade
     //
 main_Shade_1_out_1 = 
@@ -179,24 +174,27 @@ main_Shade_1_out_1 =
     // node Image[1]: x = 139, y = 659, inputs = 49, label = Image
     // input[1]: defaulting = 0, visible = 0, type = 67108863, value = "Image_1"
     // input[4]: defaulting = 0, visible = 0, type = 1, value = 1
-    // input[5]: defaulting = 0, visible = 0, type = 8, value = [-1.49012e-08 -1.49012e-08 59.951]
-    // input[6]: defaulting = 0, visible = 0, type = 8, value = [0.152167 -10.2447 61.5162]
-    // input[7]: defaulting = 0, visible = 0, type = 5, value = 5.55446
-    // input[8]: defaulting = 0, visible = 0, type = 1, value = 640
-    // input[9]: defaulting = 0, visible = 0, type = 5, value = 0.757
-    // input[10]: defaulting = 0, visible = 0, type = 8, value = [0.0837573 0.151717 0.984869]
-    // input[11]: defaulting = 1, visible = 0, type = 5, value = 30.0002
-    // input[12]: defaulting = 0, visible = 0, type = 1, value = 0
+    // input[5]: defaulting = 0, visible = 0, type = 8, value = [-1.49012e-08 -1.49012e-08 4.2528]
+    // input[6]: defaulting = 0, visible = 0, type = 8, value = [3.95863 -4.07916 6.52339]
+    // input[7]: defaulting = 1, visible = 0, type = 5, value = 3.2802
+    // input[8]: defaulting = 0, visible = 0, type = 1, value = 1906
+    // input[9]: defaulting = 0, visible = 0, type = 5, value = 0.507
+    // input[10]: defaulting = 0, visible = 0, type = 8, value = [-0.212736 0.309446 0.926815]
+    // input[11]: defaulting = 0, visible = 0, type = 5, value = 30.0
+    // input[12]: defaulting = 0, visible = 0, type = 1, value = 1
     // input[14]: defaulting = 0, visible = 0, type = 1, value = 1
     // input[15]: defaulting = 1, visible = 0, type = 32, value = "none"
     // input[16]: defaulting = 1, visible = 0, type = 32, value = "none"
     // input[17]: defaulting = 1, visible = 0, type = 1, value = 1
     // input[18]: defaulting = 1, visible = 0, type = 1, value = 1
-    // input[19]: defaulting = 0, visible = 0, type = 1, value = 0
+    // input[19]: defaulting = 0, visible = 0, type = 3, value = 0
+    // input[25]: defaulting = 0, visible = 0, type = 32, value = "/home/felix/Desktop/MPhys-Project-Fortran/2dmeshenergytrivial"
+    // input[26]: defaulting = 0, visible = 0, type = 32, value = "tiff"
     // input[29]: defaulting = 0, visible = 0, type = 3, value = 1
+    // input[30]: defaulting = 0, visible = 0, type = 16777248, value = {"kx", "ky", "E / eV"}
     // input[41]: defaulting = 0, visible = 0, type = 32, value = "rotate"
     // depth: value = 24
-    // window: position = (0.0070,0.1437), size = 0.5109x0.6562
+    // window: position = (0.0000,0.0324), size = 1.0000x0.9333
     // internal caching: 1
     //
 main_Image_1_out_1,
@@ -256,7 +254,7 @@ main_Image_1_out_3 =
 // network: end of macro body
 CacheScene(main_Image_1_in_1, main_Image_1_out_1, main_Image_1_out_2);
 }
-main_FileSelector_2_out_1 = "./energy.dx";
+main_FileSelector_2_out_1 = "/home/felix/Desktop/MPhys-Project-Fortran/energy.dx";
 main_Import_1_in_2 = NULL;
 main_Import_1_in_3 = NULL;
 main_Import_1_in_4 = NULL;
@@ -291,13 +289,13 @@ main_AutoColor_2_in_10 = NULL;
 main_AutoColor_2_out_1 = NULL;
 main_Mark_1_in_2 = "positions";
 main_Mark_1_out_1 = NULL;
-main_Compute_2_in_1 = "[$0.0,$0.1,$1*10]";
+main_Compute_2_in_1 = "[$0.0,$0.1,$1]";
 main_Compute_2_out_1 = NULL;
 main_Unmark_1_in_2 = NULL;
 main_Unmark_1_out_1 = NULL;
 main_Mark_2_in_2 = "positions";
 main_Mark_2_out_1 = NULL;
-main_Compute_4_in_1 = "[$0.0,$0.1,$1*10]";
+main_Compute_4_in_1 = "[$0.0,$0.1,$1]";
 main_Compute_4_out_1 = NULL;
 main_Unmark_2_in_2 = NULL;
 main_Unmark_2_out_1 = NULL;
@@ -625,14 +623,14 @@ macro Image(
 main_Image_1_in_1 = "Image_1";
 main_Image_1_in_3 = "X24,,";
 main_Image_1_in_4 = 1;
-main_Image_1_in_5 = [-1.49012e-08 -1.49012e-08 59.951];
-main_Image_1_in_6 = [0.152167 -10.2447 61.5162];
-main_Image_1_in_7 = 5.55446;
-main_Image_1_in_8 = 640;
-main_Image_1_in_9 = 0.757;
-main_Image_1_in_10 = [0.0837573 0.151717 0.984869];
-main_Image_1_in_11 = NULL;
-main_Image_1_in_12 = 0;
+main_Image_1_in_5 = [-1.49012e-08 -1.49012e-08 4.2528];
+main_Image_1_in_6 = [3.95863 -4.07916 6.52339];
+main_Image_1_in_7 = NULL;
+main_Image_1_in_8 = 1906;
+main_Image_1_in_9 = 0.507;
+main_Image_1_in_10 = [-0.212736 0.309446 0.926815];
+main_Image_1_in_11 = 30.0;
+main_Image_1_in_12 = 1;
 main_Image_1_in_13 = NULL;
 main_Image_1_in_14 = 1;
 main_Image_1_in_15 = NULL;
@@ -644,12 +642,12 @@ main_Image_1_in_20 = NULL;
 main_Image_1_in_21 = NULL;
 main_Image_1_in_22 = NULL;
 main_Image_1_in_23 = NULL;
-main_Image_1_in_25 = NULL;
-main_Image_1_in_26 = NULL;
+main_Image_1_in_25 = "/home/felix/Desktop/MPhys-Project-Fortran/2dmeshenergytrivial";
+main_Image_1_in_26 = "tiff";
 main_Image_1_in_27 = NULL;
 main_Image_1_in_28 = NULL;
 main_Image_1_in_29 = 1;
-main_Image_1_in_30 = NULL;
+main_Image_1_in_30 = {"kx", "ky", "E / eV"};
 main_Image_1_in_31 = NULL;
 main_Image_1_in_32 = NULL;
 main_Image_1_in_33 = NULL;

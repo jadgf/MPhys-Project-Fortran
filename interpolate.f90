@@ -85,14 +85,12 @@ Program Projected_band_structure
             kpoint(3)= 0.5d0*bvec(3,3)
 
             HK=(0d0,0d0)
-
             do i=1,nr
                 rvec = rvec_data(1,i)*avec(:,1) + rvec_data(2,i)*avec(:,2) + rvec_data(3,i)*avec(:,3)
                 phase = dot_product(kpoint,rvec)
                 HK=HK+((1-alpha)*(triv_hr(:,:,i))+alpha*(top_hr(:,:,i)))*dcmplx(cos(phase),-sin(phase))/float(ndeg(i))
             enddo
             call zheev('V','U',nb,HK,nb,k_ene,work,lwork,rwork,info)
-            call projections(HK,sam,oam)
             write(100, '(2(1x,f12.6))') k_ene(nbmin), k_ene(nbmax)
         enddo
     enddo
@@ -104,3 +102,4 @@ Program Projected_band_structure
     'end'
 end program Projected_band_structure
 
+!--gfortran -o inter interpolate.f90 -lblas -llapack
