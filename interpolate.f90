@@ -2,7 +2,7 @@ module parameters
     Implicit None
 !--------to be midified by the usere
     character(len=80):: prefix="BiTeI"
-    real*8,parameter::ef= 4.18903772,kmax=0.2,kzmax=0.2,alphamin=0.7,alphamax=8,dalpha=alphamax-alphamin
+    real*8,parameter::ef= 4.18903772,kmax=0.2,kzmax=0.2,alphamin=0.7,alphamax=0.8,dalpha=alphamax-alphamin
     integer,parameter::meshres=10,zmeshres=10,alphares=5,nkpoints=(2*meshres+1),nkzpoints=(2*zmeshres+1),nbmin=12,nbmax=13
     integer nb
     
@@ -114,7 +114,7 @@ Program Projected_band_structure
 	enddo
 	do ialpha=1,alphares
 		do ik=1,nkpoints*nkpoints*nkzpoints
-			if(k_ene_data(ialpha,ik,1)==k_ene_data(ialpha,ik,2)) then
+			if(abs(k_ene_data(ialpha,ik,1)-k_ene_data(ialpha,ik,2)) < 0.1) then
 				write(100,'(4(1x,f12.6))') alpha_data(ialpha), kmesh(ik,1), kmesh(ik,2), kmesh(ik,3)
 			endif
 		enddo
