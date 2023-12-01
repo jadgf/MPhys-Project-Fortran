@@ -2,7 +2,7 @@ module parameters
     Implicit None
 !--------to be midified by the usere
     character(len=80):: prefix="BiTeI"
-    real*8,parameter::ef= 4.18903772,kmax=0.2, alpha = 0.7747474747474747
+    real*8,parameter::ef= 4.18903772,kmax=0.07, alpha = 0.7747474747474747
     integer,parameter::meshres=100, nkpoints=(2*meshres+1),nbmin=12,nbmax=13
     integer nb
     
@@ -44,7 +44,7 @@ Program Projected_band_structure
     allocate(rvec_data(3,nr),rvec_data_t(3,nr),Hk(nb,nb),Top_hr(nb,nb,nr),Triv_hr(nb,nb,nr),ndeg(nr),ene(nb))
     read(99,*)ndeg
     do i = 1, 80
-        read(97, *)   ! Read and discard 80 lines
+        read(97, *)! Read and discard 80 lines
     end do
     do k=1,nr
        do i=1,nb
