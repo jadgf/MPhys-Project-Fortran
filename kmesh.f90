@@ -2,8 +2,8 @@ module parameters
     Implicit None
 !--------to be midified by the usere
     character(len=80):: prefix="BiTeI"
-    real*8,parameter::ef= 4.18903772,kmax=0.2
-    integer,parameter::meshres=100, nkpoints=(2*meshres+1),nbmin=12,nbmax=13
+    real*8,parameter::ef= 4.18903772,kmax=0.2,two=2.0d0,sqrt2=sqrt(two)
+    integer,parameter::meshres=100, nkpoints=(2*meshres+1),nbmin=13,nbmax=14
     integer nb
 end module parameters
 
@@ -14,7 +14,7 @@ Program Projected_band_structure
     real*8 dx, dy
     character(len=80) hamil_file,nnkp,line
     integer*4 i,j,k,nr,i1,i2,lwork,info,ikx,iky
-    real*8,parameter::third=1d0/3d0, two = 2.0d0, sqrt2 = sqrt(two)
+    real*8,parameter::third=1d0/3d0
     real*8 phase,pi2,a,b
     real*8 avec(3,3),bvec(3,3),rvec(3),kpoint(3)
     real*8,allocatable:: rvec_data(:,:),ene(:),rwork(:),k_ene(:),kpoints(:,:), sam(:,:), oam(:,:)
@@ -22,7 +22,7 @@ Program Projected_band_structure
     complex*16,allocatable:: Hk(:,:),Hamr(:,:,:),work(:)
     complex*8, parameter:: one = complex(1.d0,0.d0),im = complex(0.d0,1.d0), zero = complex(0.d0,0.d0)
 !------------------------------------------------------
-    write(hamil_file,'(a,a)')trim(adjustl(prefix)),"_hr_topological.dat"
+    write(hamil_file,'(a,a)')trim(adjustl(prefix)),"_hr_trivial.dat"
     write(nnkp,'(a,a)')      trim(adjustl(prefix)),".nnkp"
 
     pi2=4.0d0*atan(1.0d0)*2.0d0
@@ -39,9 +39,9 @@ Program Projected_band_structure
 
 !------read H(R)
     open(99,file=trim(adjustl(hamil_file)))
-    open(100,file='energy.dat')
-    open(200,file='sam.dat')
-    open(300,file='oam.dat')
+    open(100,file='energy.dx')
+    open(200,file='sam.dx')
+    open(300,file='oam.dx')
     read(99,*)
     read(99,*)nb,nr
     allocate(rvec_data(3,nr),Hk(nb,nb),Hamr(nb,nb,nr),ndeg(nr),ene(nb))
@@ -63,9 +63,9 @@ Program Projected_band_structure
     dy = kmax / meshres
     
 !----- Create header of dx files
-    write(100, '(a,2(1x,i8))') 'object 1 class gridpoints counts',nkpoints,nkpoints
-    write(200, '(a,2(1x,i8))') 'object 1 class gridpoints counts',nkpoints,nkpoints
-    write(300, '(a,2(1x,i8))') 'object 1 class gridpoints counts',nkpoints,nkpoints
+    write(100, '(a,2(1x,i8))') 'object 1 class gridpositions counts',nkpoints,nkpoints
+    write(200, '(a,2(1x,i8))') 'object 1 class gridpositions counts',nkpoints,nkpoints
+    write(300, '(a,2(1x,i8))') 'object 1 class gridpositions counts',nkpoints,nkpoints
     write(100, '(a,2(1x,f12.6))') 'origin',-kmax,-kmax
     write(200, '(a,2(1x,f12.6))') 'origin',-kmax,-kmax
     write(300, '(a,2(1x,f12.6))') 'origin',-kmax,-kmax
@@ -80,18 +80,22 @@ Program Projected_band_structure
     write(300, '(a,2(1x,i8))') 'object 2 class gridconnections counts',nkpoints,nkpoints
     write(100, '(a,i8,a,i10,a)') 'object 3 class array type float rank 1 shape',nbmax-nbmin+1,&
                                     ' item', nkpoints*nkpoints,' data follows'
-    write(200, '(a,i8,a,i10,a)') 'object 3 class array type float rank 1 shape',nbmax-nbmin+1,&
-                                    ' item', 3*nkpoints*nkpoints,' data follows'
-    write(300, '(a,i8,a,i10,a)') 'object 3 class array type float rank 1 shape',nbmax-nbmin+1,&
-                                    ' item', 3*nkpoints*nkpoints,' data follows'
+    write(200, '(a,a,i10,a)') 'object 3 class array type float rank 1 shape 6',&
+                                    ' item', nkpoints*nkpoints,' data follows'
+    write(300, '(a,a,i10,a)') 'object 3 class array type float rank 1 shape 6',&
+                                    ' item', nkpoints*nkpoints,' data follows'
 
-!----- Perform fourier transform
+                            
+!----- Perform Fourier transform
     allocate(sam(3,nbmin:nbmax), oam(3,nbmin:nbmax), k_ene(nb))
-
+                           
+    dx = kmax / meshres
+    dy = kmax / meshres
+                           
     do ikx=-meshres,meshres
         do iky=-meshres,meshres
-            kpoint(1)= ikx*dx/meshres
-            kpoint(2)= iky*dy/meshres
+            kpoint(1)= ikx*dx
+            kpoint(2)= iky*dy
             kpoint(3)= 0.5d0*bvec(3,3)
 
             HK=(0d0,0d0)
@@ -133,16 +137,19 @@ end program Projected_band_structure
 subroutine projections(H,sam,oam)
     use parameters
     Implicit None
-    complex*16 H(nb,nb),chi(2,1)
-    real*8 sam(3),oam(3),sx(1,1),sy(1,1),sz(1,1)
-    complex*8 pauli_x(2, 2), pauli_y(2, 2), pauli_z(2, 2), Lx(3,3), Ly(3,3), Lz(3,3), Y_lm(3,1)
-    integer ib,jb
+    complex*16 H(nb,nb),chi(2,1),phi(3)
+    real*8 sam(3,nbmin:nbmax),oam(3,nbmin:nbmax),sx(1,1),sy(1,1),sz(1,1),lx(1,1),ly(1,1),lz(1,1)
+    complex*8 pauli_x(2, 2), pauli_y(2, 2), pauli_z(2, 2), Lhat_x(3,3), Lhat_y(3,3), Lhat_z(3,3), Y_lm(3,1)
+    integer ib,jb,orbital_index
 !-----Spin projection
    !-Define Pauli matrices
    
-    data pauli_x / (0d0,0d0),(1d0, 0d0),(1d0,0d0),( 0d0,0d0)/
-    data pauli_y / (0d0,0d0),(0d0,-1d0),(0d0,1d0),( 0d0,0d0)/
-    data pauli_z / (1d0,0d0),(0d0, 0d0),(0d0,0d0),(-1d0,0d0)/
+    data pauli_x / (0d0,0d0),(1d0,0d0),(1d0, 0d0),( 0d0, 0d0)/
+    data pauli_y / (0d0,0d0),(0d0,1d0),(0d0,-1d0),( 0d0, 0d0)/
+    data pauli_z / (1d0,0d0),(0d0,0d0),(0d0, 0d0),(-1d0, 0d0)/
+    data Lhat_x /  (0d0,0d0),(1d0,0d0),(0d0, 0d0),( 1d0, 0d0),(0d0,0d0),(1d0,0d0),(0d0,0d0),(1d0, 0d0),( 0d0,0d0)/     
+    data Lhat_y /  (0d0,0d0),(0d0,1d0),(0d0, 0d0),( 0d0,-1d0),(0d0,0d0),(0d0,1d0),(0d0,0d0),(0d0,-1d0),( 0d0,0d0)/     
+    data Lhat_z /  (1d0,0d0),(0d0,0d0),(0d0, 0d0),( 0d0, 0d0),(0d0,0d0),(0d0,0d0),(0d0,0d0),(0d0, 0d0),(-1d0,0d0)/     
 
     sam=0d0 
     oam=0d0
@@ -152,14 +159,29 @@ subroutine projections(H,sam,oam)
                 chi(1,1) = H(jb     ,ib) 
                 chi(2,1) = H(jb+nb/2,ib)
 
-              
                 sx = matmul(conjg(transpose(chi)),matmul(pauli_x, chi))
                 sy = matmul(conjg(transpose(chi)),matmul(pauli_y, chi))
                 sz = matmul(conjg(transpose(chi)),matmul(pauli_z, chi))
-                sam(1)=sam(1)+sx(1,1)
-                sam(2)=sam(2)+sy(1,1)
-                sam(3)=sam(3)+sz(1,1)
+                sam(1,ib)=sam(1,ib)+sx(1,1)
+                sam(2,ib)=sam(2,ib)+sy(1,1)
+                sam(3,ib)=sam(3,ib)+sz(1,1)
            
+            enddo
+            do jb=1,nb,3
+                phi(1) = H(jb  ,ib) 
+                phi(2) = H(jb+1,ib)
+                phi(3) = H(jb+2,ib)                               
+                Y_lm(3,1) = (-1/sqrt2) * (phi(1) + dcmplx(0,1)*phi(2))
+                Y_lm(1,1) = ( 1/sqrt2) * (phi(1) - dcmplx(0,1)*phi(2))
+                Y_lm(2,1) = phi(3)
+                
+                lx = matmul(conjg(transpose(Y_lm)),matmul((1/sqrt2)*Lhat_x, Y_lm))
+                ly = matmul(conjg(transpose(Y_lm)),matmul((1/sqrt2)*Lhat_y, Y_lm))
+                lz = matmul(conjg(transpose(Y_lm)),matmul(Lhat_z, Y_lm))
+                oam(1,ib)=oam(1,ib)+lx(1,1)
+                oam(2,ib)=oam(2,ib)+ly(1,1)
+                oam(3,ib)=oam(3,ib)+lz(1,1)
+                                                                        
             enddo
     enddo
 end subroutine projections
