@@ -2,7 +2,7 @@ module parameters
     Implicit None
 !--------to be modified by the user
     character(len=80):: prefix="BiTeI"
-    real*8,parameter::ef= 4.18903772,kmax=0.2,kzmax=0.1,alpha=0.77474747,tolerance=0.02
+    real*8,parameter::ef= 4.18903772,kmax=0.08,kzmax=0.05,alpha=0.77474747
     integer,parameter::meshres=40,zmeshres=40,nkpoints=(2*meshres+1),nkzpoints=(2*zmeshres+1),nbmin=12,nbmax=13
     integer nb
     
@@ -47,7 +47,9 @@ Program Projected_band_structure
     read(99,*)nb,nr
     allocate(rvec_data(3,nr),rvec_data_t(3,nr),Hk(nb,nb),top_Hr(nb,nb,nr),triv_Hr(nb,nb,nr),ndeg(nr),ene(nb))
     read(99,*)ndeg
-    read(97,'(80(a))')line
+    do i= 1,80
+        read(97, *)
+    enddo
     do k=1,nr
        do i=1,nb
           do j=1,nb
@@ -81,16 +83,15 @@ Program Projected_band_structure
 	do ikx=-meshres,meshres
 		do iky=-meshres,meshres
 			do ikz=-zmeshres,zmeshres
-                Hk = 0d0
+                Hk = (0d0,0d0)
 				kpoint(1)=ikx*dxy
 				kpoint(2)=iky*dxy
-				kpoint(3)=ikz*dz + 0.5
+				kpoint(3)=ikz*dz + 0.5d0*bvec(3,3)
 
 				do i=1,nr
 					rvec = rvec_data(1,i)*avec(:,1) + rvec_data(2,i)*avec(:,2) + rvec_data(3,i)*avec(:,3)
 					phase = dot_product(kpoint,rvec)
 					HK=HK+((1-alpha)*(triv_Hr(:,:,i))+(alpha)*(top_Hr(:,:,i)))*dcmplx(cos(phase),-sin(phase))/float(ndeg(i))
-					!HK=HK+(top_Hr(:,:,i)*dcmplx(cos(phase),-sin(phase))/float(ndeg(i)))
 				enddo
 				call zheev('V','U',nb,HK,nb,k_ene,work,lwork,rwork,info)
 				write(100, '(2(1x,f12.6))') k_ene(nbmin), k_ene(nbmax) 
