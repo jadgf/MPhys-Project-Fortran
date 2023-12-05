@@ -2,8 +2,8 @@ module parameters
     Implicit None
 !--------to be modified by the user
     character(len=80):: prefix="BiTeI"
-    real*8,parameter::ef= 4.18903772,kmax=0.1,kzmax=0.05,amax=0.02
-    integer,parameter::meshres=10,zmeshres=10,ares=5,nkpoints=(2*meshres+1),nkzpoints=(2*zmeshres+1),napoints=(2*ares+1),nbmin=12,nbmax=13
+    real*8,parameter::ef= 4.18903772,kmax=0.1,kzmax=0.05,amax=0.02,acritical=0.77474747
+    integer,parameter::meshres=10,zmeshres=10,ares=2,nkpoints=(2*meshres+1),nkzpoints=(2*zmeshres+1),napoints=(2*ares+1),nbmin=12,nbmax=13
     integer nb
     
 end module parameters
@@ -14,7 +14,7 @@ Program Projected_band_structure
 !------------------------------------------------------
     real*8 dxy,dz,da
     character(len=80) top_file,triv_file,nnkp,line
-    integer*4 i,j,k,nr,i1,i2,j1,j2,lwork,info,ikx,iky,ikz,ia,ik
+    integer*4 i,j,k,nr,i1,i2,j1,j2,lwork,info,ikx,iky,ikz,ia,ik,count
     real*8,parameter::third=1d0/3d0, two = 2.0d0, sqrt2 = sqrt(two)
     real*8 phase,pi2,x1,y1,x2,y2,a
     real*8 avec(3,3),bvec(3,3),rvec(3),kpoint(3)
@@ -76,13 +76,14 @@ Program Projected_band_structure
     write(100, '(a,3(1x,f12.6))') 'delta',0d0,dxy,0d0
     write(100, '(a,3(1x,f12.6))') 'delta',0d0,0d0,dz
     write(100, '(a,3(1x,i8))') 'object 2 class gridconnections counts',nkpoints,nkpoints,nkzpoints
-    write(100, '(a,i8,a,i10,a)') 'object 3 class array type float rank 1 shape',nbmax-nbmin+2,&
-                                     ' item', nkpoints*nkpoints*nkzpoints*napoints, ' data follows'
 
 !----- Perform fourier transform
     allocate(sam(3,nbmin:nbmax), oam(3,nbmin:nbmax), k_ene(nb))
-
+	count=3
 	do ia=-ares,ares	
+    	write(100, '(a,i8,a,i8,a,i10,a)') 'object',count,' class array type float rank 1 shape',2,&
+                                     ' item', nkpoints*nkpoints*nkzpoints, ' data follows'
+		count=count+1	
 		do ikx=-meshres,meshres
 			do iky=-meshres,meshres
 				do ikz=-zmeshres,zmeshres
@@ -90,7 +91,7 @@ Program Projected_band_structure
 					kpoint(1)=ikx*dxy
 					kpoint(2)=iky*dxy
 					kpoint(3)=ikz*dz + 0.5d0*bvec(3,3)
-					a=ia*da + 0.774747
+					a=ia*da + acritical
 
 					do i=1,nr
 						rvec = rvec_data(1,i)*avec(:,1) + rvec_data(2,i)*avec(:,2) + rvec_data(3,i)*avec(:,3)
@@ -99,15 +100,23 @@ Program Projected_band_structure
 						!HK=HK+(top_Hr(:,:,i)*dcmplx(cos(phase),-sin(phase))/float(ndeg(i)))
 					enddo
 					call zheev('V','U',nb,HK,nb,k_ene,work,lwork,rwork,info)
-					write(100, '(3(1x,f12.6))') k_ene(nbmin), k_ene(nbmax), a
+					write(100, '(3(1x,f12.6))') k_ene(nbmin), k_ene(nbmax)
 				enddo
 			enddo
 		enddo
+		write(100, '(a)') 'attribute "dep" string "positions"'
 	enddo
-    write(100,'(A,/,A,/,A,/,A)') &
-    'object "regular positions regular connections" class field', &
-    'component "positions" value 1', &
-    'component "connections" value 2', &
-    'component "data" value 3', &
-    'end'
+	do i=0,napoints
+		write(100,'(A,i8,A,/,A,/,A,/,A,i8,/)') &
+		'object',napoints+3+i,' class field', &
+		'component "positions" value 1', &
+		'component "connections" value 2', &
+		'component "data" value ',3+i
+	enddo
+	write(100, '(a)') 'object "series" class series'
+	do i=0,napoints
+		write(100, '(a,i8,a,i8,a,i8)') 'member', i, ' value', (i+napoints+3), ' position', i
+	enddo
+
+	write(100, '(A)') 'end'
 end Program Projected_band_structure
