@@ -14,9 +14,9 @@ Program Projected_band_structure
 !------------------------------------------------------
     real*8 dxy,dz
     character(len=80) top_file,triv_file,nnkp,line
-    integer*4 i,j,k,nr,i1,i2,lwork,info,ikx,iky,ikz,ik,count
+    integer*4 i,j,k,nr,i1,i2,j1,j2,lwork,info,ikx,iky,ikz,ik,count
     real*8,parameter::third=1d0/3d0, two = 2.0d0, sqrt2 = sqrt(two)
-    real*8 phase,pi2,a,b
+    real*8 phase,pi2,a,b,x1,y1
     real*8 avec(3,3),bvec(3,3),rvec(3),kpoint(3)
     real*8,allocatable:: rvec_data(:,:),rvec_data_t(:,:),ene(:),rwork(:)
 	real*8, allocatable:: k_ene(:),k_ene_data(:,:),sam(:,:),oam(:,:),kmesh(:,:)
@@ -53,8 +53,8 @@ Program Projected_band_structure
           do j=1,nb
              read(99,*)rvec_data(1,k),rvec_data(2,k),rvec_data(3,k),i1,i2,a,b
              top_Hr(i1,i2,k)=dcmplx(a,b)
-             read(97,*)rvec_data_t(1,k),rvec_data_t(2,k),rvec_data_t(3,k),i1,i2,a,b
-             triv_Hr(i1,i2,k)=dcmplx(a,b)
+             read(97,*)rvec_data_t(1,k),rvec_data_t(2,k),rvec_data_t(3,k),j1,j2,x1,y1
+             triv_Hr(j1,j2,k)=dcmplx(x1,y1)
           enddo
        enddo
     enddo
@@ -67,7 +67,7 @@ Program Projected_band_structure
 
 !----- Create header of dx files
     write(100, '(a,3(1x,i8))') 'object 1 class gridpositions counts',nkpoints,nkpoints,nkzpoints
-    write(100, '(a,3(1x,f12.6))') 'origin',-kmax,-kmax,-kzmax
+    write(100, '(a,3(1x,f12.6))') 'origin',-kmax,-kmax,kzmax
     write(100, '(a,3(1x,f12.6))') 'delta',dxy,0d0,0d0
     write(100, '(a,3(1x,f12.6))') 'delta',0d0,dxy,0d0
     write(100, '(a,3(1x,f12.6))') 'delta',0d0,0d0,dz
