@@ -42,7 +42,7 @@ Program Projected_band_structure
 !------read H(R)
     open(99,file=trim(adjustl(top_file)))
     open(97,file=trim(adjustl(triv_file)))
-    open(100,file='3denergy.dx')
+    open(100,file='btp_motion.dx')
     read(99,*)
     read(99,*)nb,nr
     allocate(rvec_data(3,nr),rvec_data_t(3,nr),Hk(nb,nb),top_Hr(nb,nb,nr),triv_Hr(nb,nb,nr),ndeg(nr),ene(nb))
