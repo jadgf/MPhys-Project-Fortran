@@ -8,7 +8,7 @@ Program Wannier_band_structure
       character(len=80) top_file,triv_file,nnkp,line
       integer*4,parameter::nk=(nkpath-1)*np+1,alpha_res = 100
       integer*4 i,j,k,l,nr,i1,i2,j1,j2,nb,lwork,info,count, min_index
-      real*8,parameter::third=1d0/3d0,alpha_max=0.5, alpha_crit = 0.5, z_plane = 0.5d0*0.9144694
+      real*8,parameter::third=1d0/3d0,alpha_max=0.05, alpha_crit = 0.8, z_plane = 0.5d0
       real*8 phase,pi2,jk,a,b,x1,y1,alpha,dalpha, min_eg, min_alpha
       real*8 avec(3,3),bvec(3,3)
       real*8 klist(3,1:nk),xk(nk),kpath(3,np),ktemp1(3),ktemp2(3),xkl(nkpath)
@@ -87,7 +87,6 @@ Program Wannier_band_structure
       dalpha = alpha_max/alpha_res
       ene=0d0
       count =1
-      min_eg = 1
       do l = -alpha_res, alpha_res
          alpha = (l*dalpha) + alpha_crit
          do k=1,nk
@@ -98,24 +97,21 @@ Program Wannier_band_structure
                do i=1,3
                   phase=phase+klist(i,k)*rvec_data_t(i,j)
                enddo
-               HK=HK+((1-alpha)*(triv_hr(:,:,i))+alpha*(top_hr(:,:,i)))*dcmplx(cos(phase),-sin(phase))/float(ndeg(i))
+               HK=HK+((1-alpha)*(triv_hr(:,:,j))+alpha*(top_hr(:,:,j)))*dcmplx(cos(phase),-sin(phase))/float(ndeg(j))
             enddo
             call zheev('V','U',nb,HK,nb,ene(:,k),work,lwork,rwork,info) 
          enddo
          e_g_data(count) = MINVAL(ene(13,:))-MAXVAL(ene(12,:))
-         min_eg = MIN(min_eg, e_g_data(count))
+         print *, e_g_data(count) , alpha
          alphas(count) = alpha
          count = count +1
       enddo
 
-      do i = 1,(2*alpha_res+1)
-            print *, e_g_data(i)
-      enddo
-
+      min_eg = MINVAL(e_g_data)
       min_index = MINLOC(e_g_data, 1)
       min_alpha = alphas(min_index)
       
       print * , "Min E_G for ", alpha_crit - alpha_max," < alpha < ",alpha_crit + alpha_max,": ", min_eg
-      print * , "Alpha for this value: ", min_alpha, " index: ",min_index
+      print * , "Alpha for this value: ", min_alpha
 end program  
             
