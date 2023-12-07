@@ -6,13 +6,13 @@ Program Wannier_band_structure
 !------------------------------------------------------
       character(len=30)::klabel(nkpath)
       character(len=80) top_file,triv_file,nnkp,line
-      integer*4,parameter::nk=(nkpath-1)*np+1,alpha_res = 50
+      integer*4,parameter::nk=(nkpath-1)*np+1,alpha_res = 100
       integer*4 i,j,k,l,nr,i1,i2,j1,j2,nb,lwork,info,count, min_index
-      real*8,parameter::third=1d0/3d0,alpha_max=0.25, alpha_crit = 0.7, z_plane = 0.5d0*0.9144694
+      real*8,parameter::third=1d0/3d0,alpha_max=0.5, alpha_crit = 0.5, z_plane = 0.5d0*0.9144694
       real*8 phase,pi2,jk,a,b,x1,y1,alpha,dalpha, min_eg, min_alpha
       real*8 avec(3,3),bvec(3,3)
       real*8 klist(3,1:nk),xk(nk),kpath(3,np),ktemp1(3),ktemp2(3),xkl(nkpath)
-      real*8,allocatable:: rvec(:,:),rvec_data(:,:),rvec_data_t(:,:),ene(:),rwork(:), e_g_data(:)
+      real*8,allocatable:: rvec(:,:),rvec_data(:,:),rvec_data_t(:,:),ene(:,:),rwork(:), e_g_data(:),alphas(:)
       integer*4,allocatable:: ndeg(:)
       complex*16,allocatable::Hk(:,:),Top_hr(:,:,:),Triv_hr(:,:,:),work(:)
 !------------------------------------------------------
@@ -66,7 +66,7 @@ Program Wannier_band_structure
       open(97,file=trim(adjustl(triv_file)))
       read(99,*)
       read(99,*)nb,nr
-      allocate(rvec_data(3,nr),rvec_data_t(3,nr),Hk(nb,nb),top_hr(nb,nb,nr),triv_hr(nb,nb,nr),ndeg(nr),ene(nb))
+      allocate(rvec_data(3,nr),rvec_data_t(3,nr),Hk(nb,nb),top_hr(nb,nb,nr),triv_hr(nb,nb,nr),ndeg(nr),ene(nb,nk))
       read(99,*)ndeg
       do i = 1, 80
           read(97, *)! Read and discard 80 lines
@@ -82,11 +82,12 @@ Program Wannier_band_structure
          enddo
       enddo
      lwork=max(1,2*nb-1)
-     allocate(work(max(1,lwork)),rwork(max(1,3*nb-2)),e_g_data(nk*((2*alpha_res)+1)))
+     allocate(work(max(1,lwork)),rwork(max(1,3*nb-2)),e_g_data((2*alpha_res)+1),alphas((2*alpha_res)+1))
 !---- Fourier transform H(R) to H(k)
       dalpha = alpha_max/alpha_res
       ene=0d0
-      count = 1
+      count =1
+      min_eg = 1
       do l = -alpha_res, alpha_res
          alpha = (l*dalpha) + alpha_crit
          do k=1,nk
@@ -95,20 +96,26 @@ Program Wannier_band_structure
 
                phase=0.0d0
                do i=1,3
-                  phase=phase+klist(i,k)*rvec_data(i,j)
+                  phase=phase+klist(i,k)*rvec_data_t(i,j)
                enddo
                HK=HK+((1-alpha)*(triv_hr(:,:,i))+alpha*(top_hr(:,:,i)))*dcmplx(cos(phase),-sin(phase))/float(ndeg(i))
             enddo
-            call zheev('V','U',nb,HK,nb,ene(:),work,lwork,rwork,info) 
-            e_g_data(count) = ene(13)-ene(12)
-            count = count + 1
+            call zheev('V','U',nb,HK,nb,ene(:,k),work,lwork,rwork,info) 
          enddo
+         e_g_data(count) = MINVAL(ene(13,:))-MAXVAL(ene(12,:))
+         min_eg = MIN(min_eg, e_g_data(count))
+         alphas(count) = alpha
+         count = count +1
       enddo
-      min_eg = MINVAL(e_g_data(:))
+
+      do i = 1,(2*alpha_res+1)
+            print *, e_g_data(i)
+      enddo
+
       min_index = MINLOC(e_g_data, 1)
-      min_alpha = (alpha_crit - dalpha) + (min_index*dalpha)
+      min_alpha = alphas(min_index)
       
       print * , "Min E_G for ", alpha_crit - alpha_max," < alpha < ",alpha_crit + alpha_max,": ", min_eg
-      print * , "Alpha for this value: ", min_alpha
+      print * , "Alpha for this value: ", min_alpha, " index: ",min_index
 end program  
             
