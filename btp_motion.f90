@@ -115,7 +115,7 @@ Program Projected_band_structure
 
     count=3
     do ia=-ares,ares
-        write(*,'(a,i3,a,i3)') 'interpolation =',ia,'processor =',myid
+        print *,'interpolation =',ia,'processor =',myid
       a=ia*da + acritical
 
       if(myid.eq.0) then
