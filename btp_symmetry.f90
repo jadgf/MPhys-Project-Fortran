@@ -3,7 +3,7 @@ module parameters
 !--------to be modified by the user
     character(len=80):: prefix="BiTeI"
     real*8,parameter::ef= 4.18903772,kxmax=0.06,kymax=kxmax/2,kzmax=0.035,amax=0.05,acritical=0.77966
-    integer,parameter::xmeshres=20,ymeshres=xmeshres/2,zmeshres=10,ares=1,nkxpoints=(2*xmeshres+1),nkypoints=(2*ymeshres+1),nkzpoints=(2*zmeshres+1),napoints=(2*ares+1),nbmin=12,nbmax=13,&
+    integer,parameter::xmeshres=40,ymeshres=xmeshres/2,zmeshres=20,ares=7,nkxpoints=(2*xmeshres+1),nkypoints=(2*ymeshres+1),nkzpoints=(2*zmeshres+1),napoints=(2*ares+1),nbmin=12,nbmax=13,&
                                                    nkp3=nkxpoints*nkypoints*nkzpoints
     integer nb
     INTEGER IERR,MYID,NUMPROCS
@@ -48,7 +48,7 @@ Program Projected_band_structure
     open(99,file=trim(adjustl(top_file)))
     open(97,file=trim(adjustl(triv_file)))
     if(myid.eq.0) then
-        open(100,file='btp_motion.dx')
+        open(100,file='btp_symmetry.dx')
     endif
     read(99,*)
     read(99,*)nb,nr
@@ -116,7 +116,7 @@ Program Projected_band_structure
 
     count=3
     do ia=-ares,ares
-        print *,'interpolation =',ia,'processor =',myid
+        print *,'interpolation =',ia+ares,'processor =',myid
       a=ia*da + acritical
 
       if(myid.eq.0) then

@@ -1,5 +1,5 @@
 //
-// time: Fri Dec  8 19:19:03 2023
+// time: Fri Dec  8 19:56:16 2023
 //
 // version: 3.2.0 (format), 4.4.4 (DX)
 //
@@ -13,13 +13,13 @@ macro main(
 ) {
     // 
     // node FileSelector[1]: x = 248, y = 90, inputs = 0, label = FileSelector
-    // output[1]: visible = 1, type = 32, value = "/home/felix/Desktop/MPhys-Project-Fortran/btp_motion.dx"
-    // output[2]: visible = 1, type = 32, value = "btp_motion.dx"
+    // output[1]: visible = 1, type = 32, value = "/Users/James/Desktop/GitHub/MPhys-Project-Fortran/btp_symmetry.dx"
+    // output[2]: visible = 1, type = 32, value = "btp_symmetry.dx"
     //
     // 
     // node Import[1]: x = 274, y = 187, inputs = 6, label = Import
     // input[4]: defaulting = 0, visible = 0, type = 1, value = 0
-    // input[5]: defaulting = 0, visible = 0, type = 1, value = 4
+    // input[5]: defaulting = 0, visible = 0, type = 1, value = 14
     //
 main_Import_1_out_1 = 
     Import(
@@ -33,12 +33,12 @@ main_Import_1_out_1 =
     // 
     // node Integer[1]: x = 416, y = 94, inputs = 11, label = Integer
     // input[1]: defaulting = 0, visible = 0, type = 32, value = "Integer_1"
-    // input[3]: defaulting = 0, visible = 0, type = 1, value = 2 
+    // input[3]: defaulting = 0, visible = 0, type = 1, value = 13 
     // input[5]: defaulting = 1, visible = 0, type = 1, value = -1000000
     // input[6]: defaulting = 1, visible = 0, type = 1, value = 1000000
     // input[7]: defaulting = 1, visible = 0, type = 5, value = 1.0
     // input[9]: defaulting = 1, visible = 0, type = 1, value = 0
-    // output[1]: visible = 1, type = 1, value = 2 
+    // output[1]: visible = 1, type = 1, value = 13 
     //
     // 
     // node Select[1]: x = 350, y = 248, inputs = 3, label = Select
@@ -53,12 +53,12 @@ main_Select_1_out_1 =
     // 
     // node Scalar[1]: x = 493, y = 86, inputs = 11, label = Scalar
     // input[1]: defaulting = 0, visible = 0, type = 32, value = "Scalar_1"
-    // input[3]: defaulting = 0, visible = 0, type = 5, value = 26.0 
+    // input[3]: defaulting = 0, visible = 0, type = 5, value = 14.0 
     // input[5]: defaulting = 1, visible = 0, type = 5, value = -1000000.0
     // input[6]: defaulting = 1, visible = 0, type = 5, value = 1000000.0
     // input[7]: defaulting = 1, visible = 0, type = 5, value = 1.0
     // input[9]: defaulting = 1, visible = 0, type = 1, value = 5
-    // output[1]: visible = 1, type = 5, value = 26.0 
+    // output[1]: visible = 1, type = 5, value = 14.0 
     //
     // 
     // node Compute[2]: x = 433, y = 289, inputs = 3, label = Compute
@@ -112,13 +112,13 @@ main_Collect_1_out_1 =
     main_Unmark_1_out_1
     ) [instance: 1, cache: 1];
     // 
-    // node Glyph[1]: x = 142, y = 450, inputs = 7, label = Glyph
+    // node Glyph[1]: x = 57, y = 450, inputs = 7, label = Glyph
     // input[2]: defaulting = 0, visible = 1, type = 32, value = "speedy"
     // input[5]: defaulting = 0, visible = 1, type = 5, value = 0.0
     //
 main_Glyph_1_out_1 = 
     Glyph(
-    main_Collect_1_out_1,
+    main_Glyph_1_in_1,
     main_Glyph_1_in_2,
     main_Glyph_1_in_3,
     main_Glyph_1_in_4,
@@ -127,26 +127,38 @@ main_Glyph_1_out_1 =
     main_Glyph_1_in_7
     ) [instance: 1, cache: 1];
     // 
+    // node Isosurface[1]: x = 242, y = 444, inputs = 6, label = Isosurface
+    //
+main_Isosurface_1_out_1 = 
+    Isosurface(
+    main_Collect_1_out_1,
+    main_Isosurface_1_in_2,
+    main_Isosurface_1_in_3,
+    main_Isosurface_1_in_4,
+    main_Isosurface_1_in_5,
+    main_Isosurface_1_in_6
+    ) [instance: 1, cache: 1];
+    // 
     // node Scale[1]: x = 478, y = 538, inputs = 2, label = Scale
     // input[2]: defaulting = 0, visible = 1, type = 5, value = 10.0
     //
 main_Scale_1_out_1 = 
     Scale(
-    main_Glyph_1_out_1,
+    main_Isosurface_1_out_1,
     main_Scale_1_in_2
     ) [instance: 1, cache: 1];
     // 
     // node Image[1]: x = 300, y = 553, inputs = 49, label = Image
     // input[1]: defaulting = 0, visible = 0, type = 67108863, value = "Image_1"
     // input[4]: defaulting = 0, visible = 0, type = 1, value = 1
-    // input[5]: defaulting = 0, visible = 0, type = 8, value = [2.98023e-08 0.015 4.57235]
-    // input[6]: defaulting = 0, visible = 0, type = 8, value = [3.41457 2.48876 7.55831]
-    // input[7]: defaulting = 1, visible = 0, type = 5, value = 2.76882
-    // input[8]: defaulting = 0, visible = 0, type = 1, value = 989
-    // input[9]: defaulting = 0, visible = 0, type = 5, value = 0.687
-    // input[10]: defaulting = 0, visible = 0, type = 8, value = [-0.446442 -0.368185 0.815555]
-    // input[11]: defaulting = 0, visible = 0, type = 5, value = 30.0
-    // input[12]: defaulting = 0, visible = 0, type = 1, value = 1
+    // input[5]: defaulting = 0, visible = 0, type = 8, value = [0 0 4.57235]
+    // input[6]: defaulting = 0, visible = 0, type = 8, value = [-2.0979 -3.55917 5.62548]
+    // input[7]: defaulting = 0, visible = 0, type = 5, value = 3.54805
+    // input[8]: defaulting = 0, visible = 0, type = 1, value = 1219
+    // input[9]: defaulting = 0, visible = 0, type = 5, value = 0.691
+    // input[10]: defaulting = 0, visible = 0, type = 8, value = [0.0727215 0.243325 0.967215]
+    // input[11]: defaulting = 1, visible = 0, type = 5, value = 45.1834
+    // input[12]: defaulting = 0, visible = 0, type = 1, value = 0
     // input[14]: defaulting = 0, visible = 0, type = 1, value = 1
     // input[15]: defaulting = 1, visible = 0, type = 32, value = "none"
     // input[16]: defaulting = 1, visible = 0, type = 32, value = "none"
@@ -159,7 +171,7 @@ main_Scale_1_out_1 =
     // input[33]: defaulting = 0, visible = 0, type = 3, value = 1
     // input[41]: defaulting = 0, visible = 0, type = 32, value = "rotate"
     // depth: value = 24
-    // window: position = (0.4354,0.0241), size = 0.5224x0.6676
+    // window: position = (0.3898,0.1170), size = 0.8388x0.9485, screen = 0
     // internal caching: 1
     //
 main_Image_1_out_1,
@@ -219,16 +231,16 @@ main_Image_1_out_3 =
 // network: end of macro body
 CacheScene(main_Image_1_in_1, main_Image_1_out_1, main_Image_1_out_2);
 }
-main_FileSelector_1_out_1 = "/home/felix/Desktop/MPhys-Project-Fortran/btp_motion.dx";
+main_FileSelector_1_out_1 = "/Users/James/Desktop/GitHub/MPhys-Project-Fortran/btp_symmetry.dx";
 main_Import_1_in_2 = NULL;
 main_Import_1_in_3 = NULL;
 main_Import_1_in_4 = 0;
-main_Import_1_in_5 = 4;
+main_Import_1_in_5 = 14;
 main_Import_1_in_6 = NULL;
 main_Import_1_out_1 = NULL;
 main_Integer_1_in_1 = "Integer_1";
 main_Integer_1_in_2 = NULL;
-main_Integer_1_in_3 = 2 ;
+main_Integer_1_in_3 = 13 ;
 main_Integer_1_in_4 = NULL;
 main_Integer_1_in_5 = NULL;
 main_Integer_1_in_6 = NULL;
@@ -237,12 +249,12 @@ main_Integer_1_in_8 = NULL;
 main_Integer_1_in_9 = NULL;
 main_Integer_1_in_10 = NULL;
 main_Integer_1_in_11 = NULL;
-main_Integer_1_out_1 = 2 ;
+main_Integer_1_out_1 = 13 ;
 main_Select_1_in_3 = NULL;
 main_Select_1_out_1 = NULL;
 main_Scalar_1_in_1 = "Scalar_1";
 main_Scalar_1_in_2 = NULL;
-main_Scalar_1_in_3 = 26.0 ;
+main_Scalar_1_in_3 = 14.0 ;
 main_Scalar_1_in_4 = NULL;
 main_Scalar_1_in_5 = NULL;
 main_Scalar_1_in_6 = NULL;
@@ -251,7 +263,7 @@ main_Scalar_1_in_8 = NULL;
 main_Scalar_1_in_9 = NULL;
 main_Scalar_1_in_10 = NULL;
 main_Scalar_1_in_11 = NULL;
-main_Scalar_1_out_1 = 26.0 ;
+main_Scalar_1_out_1 = 14.0 ;
 main_Compute_2_in_1 = "($0.1-$0.0)<$1*0.001?1:0";
 main_Compute_2_out_1 = NULL;
 main_Mark_1_in_2 = "positions";
@@ -262,13 +274,19 @@ main_Compute_3_out_1 = NULL;
 main_Unmark_1_in_2 = NULL;
 main_Unmark_1_out_1 = NULL;
 main_Collect_1_out_1 = NULL;
+main_Glyph_1_in_1 = NULL;
 main_Glyph_1_in_2 = "speedy";
 main_Glyph_1_in_3 = NULL;
 main_Glyph_1_in_4 = NULL;
 main_Glyph_1_in_5 = 0.0;
 main_Glyph_1_in_6 = NULL;
 main_Glyph_1_in_7 = NULL;
-main_Glyph_1_out_1 = NULL;
+main_Isosurface_1_in_2 = NULL;
+main_Isosurface_1_in_3 = NULL;
+main_Isosurface_1_in_4 = NULL;
+main_Isosurface_1_in_5 = NULL;
+main_Isosurface_1_in_6 = NULL;
+main_Isosurface_1_out_1 = NULL;
 main_Scale_1_in_2 = 10.0;
 main_Scale_1_out_1 = NULL;
 macro Image(
@@ -586,14 +604,14 @@ macro Image(
 main_Image_1_in_1 = "Image_1";
 main_Image_1_in_3 = "X24,,";
 main_Image_1_in_4 = 1;
-main_Image_1_in_5 = [2.98023e-08 0.015 4.57235];
-main_Image_1_in_6 = [3.41457 2.48876 7.55831];
-main_Image_1_in_7 = NULL;
-main_Image_1_in_8 = 989;
-main_Image_1_in_9 = 0.687;
-main_Image_1_in_10 = [-0.446442 -0.368185 0.815555];
-main_Image_1_in_11 = 30.0;
-main_Image_1_in_12 = 1;
+main_Image_1_in_5 = [0 0 4.57235];
+main_Image_1_in_6 = [-2.0979 -3.55917 5.62548];
+main_Image_1_in_7 = 3.54805;
+main_Image_1_in_8 = 1219;
+main_Image_1_in_9 = 0.691;
+main_Image_1_in_10 = [0.0727215 0.243325 0.967215];
+main_Image_1_in_11 = NULL;
+main_Image_1_in_12 = 0;
 main_Image_1_in_13 = NULL;
 main_Image_1_in_14 = 1;
 main_Image_1_in_15 = NULL;
