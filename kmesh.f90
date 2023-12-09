@@ -151,6 +151,9 @@ subroutine projections(H,sam,oam)
     data Lhat_y /  (0d0,0d0),(0d0,1d0),(0d0, 0d0),( 0d0,-1d0),(0d0,0d0),(0d0,1d0),(0d0,0d0),(0d0,-1d0),( 0d0,0d0)/     
     data Lhat_z /  (1d0,0d0),(0d0,0d0),(0d0, 0d0),( 0d0, 0d0),(0d0,0d0),(0d0,0d0),(0d0,0d0),(0d0, 0d0),(-1d0,0d0)/     
 
+	Lhat_x = Lhat_x * 1/sqrt2
+	Lhat_y = Lhat_y * 1/sqrt2
+
     sam=0d0 
     oam=0d0
 
@@ -175,8 +178,8 @@ subroutine projections(H,sam,oam)
                 Y_lm(1,1) = ( 1/sqrt2) * (phi(1) - dcmplx(0,1)*phi(2))
                 Y_lm(2,1) = phi(3)
                 
-                lx = matmul(conjg(transpose(Y_lm)),matmul((1/sqrt2)*Lhat_x, Y_lm))
-                ly = matmul(conjg(transpose(Y_lm)),matmul((1/sqrt2)*Lhat_y, Y_lm))
+                lx = matmul(conjg(transpose(Y_lm)),matmul(Lhat_x, Y_lm))
+                ly = matmul(conjg(transpose(Y_lm)),matmul(Lhat_y, Y_lm))
                 lz = matmul(conjg(transpose(Y_lm)),matmul(Lhat_z, Y_lm))
                 oam(1,ib)=oam(1,ib)+lx(1,1)
                 oam(2,ib)=oam(2,ib)+ly(1,1)
