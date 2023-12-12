@@ -3,8 +3,13 @@ module parameters
 !--------to be modified by the user
     character(len=80):: prefix="BiTeI"
     real*8,parameter::ef= 4.18903772,kxmax=0.03,kymax=0.03,kzmax=0.035,amax=0.05,acritical=0.77966
+<<<<<<< Updated upstream
     integer,parameter::xmeshres=40,ymeshres=40,zmeshres=25,ares=7,nkxpoints=(2*xmeshres+1),nkypoints=(2*ymeshres+1),nkzpoints=(2*zmeshres+1),napoints=(2*ares+1),nbmin=12,nbmax=13,&
                                                    nkp3=nkxpoints*nkypoints*nkzpoints
+=======
+    integer,parameter::xmeshres=50,ymeshres=50,zmeshres=30,ares=2,nkxpoints=(2*xmeshres+1),nkypoints=(2*ymeshres+1),nkzpoints=(2*zmeshres+1),&
+																	napoints=(2*ares+1),nbmin=12,nbmax=13,nkp3=nkxpoints*nkypoints*nkzpoints
+>>>>>>> Stashed changes
     integer nb
     INTEGER IERR,MYID,NUMPROCS
     
