@@ -1,7 +1,7 @@
       Program Wannier_band_structure
       Implicit None
 !--------to be midified by the usere
-      character(len=80):: prefix="data/BiTeI"
+      character(len=80):: prefix="BiTeI"
       integer,parameter::nkpath=3,np=200
 !--------Variables for k-mesh:
       integer,parameter::resolution = 50;
@@ -75,7 +75,7 @@
 
 !------read H(R)
       open(99,file=trim(adjustl(hamil_file)),err=444)
-      open(100,file='dat_files/band.dat')
+      open(100,file='band.dat')
       read(99,*)
       read(99,*)nb,nr
       allocate(rvec(3,nr),Hk(nb,nb),Hamr(nb,nb,nr),ndeg(nr),ene(nb,nk),od(nb,nk,3),H_col(nb))
@@ -157,7 +157,7 @@
      real*8 xkl(nkp),ef
      character(len=30)kl(nkp)
      
-     open(99,file='plt_files/band.plt')
+     open(99,file='band.plt')
      write(99,'(a,f12.8)')'ef=',ef
      write(99,'(a)') 'set xtics ( \'
      do i=1,nkp
@@ -166,15 +166,15 @@
         if(i.eq.nkp) write(99,'(3a,f12.6,a)')'"',trim(adjustl(kl(i))),'"',xkl(i)," )"
 
      enddo
-     write(99,'(a,f12.6,a,f12.6,a)') 'set xrange [ -0.15 : 0.15]'
+     write(99,'(a,f12.6,a,f12.6,a)') 'set xrange [ -0.1 : 0.1]'
      write(99,'(a)') &
           'set terminal pdfcairo enhanced font "DejaVu"  transparent fontscale 1 size 5.00in, 7.50in'
-     write(99,'(a,f4.2,a)')'set output "pdfs/band.pdf"'
+     write(99,'(a,f4.2,a)')'set output "band.pdf"'
      write(99,'(12(a,/),a)') &
           'set encoding iso_8859_1',&
           'set size ratio 0 1.0,1.0',&
           'set ylabel "E-E_{CBM} (eV)"',&
-          'set yrange [-2 : 2 ]',&
+          'set yrange [-0.4: 0.4 ]',&
           'unset key',&
           'set ytics 1.0 scale 1 nomirror out',&
           'set mytics 2',&
