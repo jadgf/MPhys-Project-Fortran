@@ -1,39 +1,38 @@
       Program Wannier_band_structure
       Implicit None
 !--------to be midified by the usere
-      character(len=80):: prefix="data/BiTeI"
-      integer,parameter::nkpath=3,np=200
-!--------Variables for k-mesh:
-      integer,parameter::resolution = 50;
-      real*8,parameter::tolerance = 0.002;
-      real*8,parameter::energy_diff = 0.03;
+      character(len=80):: prefix="BiTeI"
+      integer,parameter::nkpath=3,np=600
+
 !------------------------------------------------------
       integer*4 ik,ikmax, skip
       real*8 kz,ef 
       real*8 :: Te_sum, Bi_sum, I_sum
       character(len=30)::klabel(nkpath)
-      character(len=80) hamil_file,nnkp,line
+      character(len=80) nnkp,line,top_file,triv_file
       integer*4,parameter::nk=(nkpath-1)*np+1
-      integer*4 i,j,k,l,nr,i1,i2,nb,lwork,info
-      real*8,parameter::third=1d0/3d0!,kz=0d0
-      real*8 phase,pi2,jk,a,b
-      real*8 klist(3,1:nk),xk(nk),kpath(3,np),bvec(3,3),ktemp1(3),ktemp2(3),xkl(nkpath)
-      real*8,allocatable:: rvec(:,:),ene(:,:),rwork(:),od(:,:,:)
+      integer*4 i,j,k,nr,i1,i2,lwork,info,ikx,iky,j1,j2,nb,l
+      real*8,parameter::third=1d0/3d0, alpha = 0.77966
+      real*8 phase,pi2,jk,a,b,x1,y1
+      real*8 klist(3,1:nk),xk(nk),kpath(3,np),bvec(3,3),avec(3,3),ktemp1(3),ktemp2(3),xkl(nkpath)
+      real*8,allocatable:: rvec(:,:),rvec_data(:,:),ene(:,:),rwork(:),od(:,:,:)
       integer*4,allocatable:: ndeg(:)
-      complex*16,allocatable:: Hk(:,:),Hamr(:,:,:),work(:),H_col(:)
+      complex*16,allocatable:: Hk(:,:),Top_hr(:,:,:),Triv_hr(:,:,:),work(:),H_col(:)
       complex*16 temp1,temp2
 !------------------------------------------------------
-      write(hamil_file,'(a,a)')trim(adjustl(prefix)),"_hr_topological.dat"
+      write(top_file,'(a,a)')trim(adjustl(prefix)),"_hr_topological.dat"
+      write(triv_file,'(a,a)')trim(adjustl(prefix)),"_hr_trivial.dat"
       write(nnkp,'(a,a)')      trim(adjustl(prefix)),".nnkp"
-
       pi2=4.0d0*atan(1.0d0)*2.0d0
-
 !---------------  reciprocal vectors
-      open(98,file=trim(adjustl(nnkp)),err=333)
-111   read(98,'(a)')line
-      if(trim(adjustl(line)).ne."begin recip_lattice") goto 111
-      
-      read(98,*)bvec
+      open(98,file=trim(adjustl(nnkp)))
+      111 read(98,'(a)')line
+          if(trim(adjustl(line)).ne."begin real_lattice") goto 111
+          read(98,*)avec
+          read(98,'(a)')line
+          read(98,'(a)')line
+          read(98,'(a)')line
+          read(98,*)bvec
 !---------------kpath
       data kpath(:,1) /     0.5d0,      0.0d0,    0.5d0/  !L
       data kpath(:,2) /     0.0d0,      0.0d0,    0.5d0/  !A
@@ -74,17 +73,23 @@
       klist=klist*pi2
 
 !------read H(R)
-      open(99,file=trim(adjustl(hamil_file)),err=444)
-      open(100,file='dat_files/band.dat')
+      open(99,file=trim(adjustl(top_file)))
+      open(97,file=trim(adjustl(triv_file)))
+      open(100,file='band.dat')
       read(99,*)
       read(99,*)nb,nr
-      allocate(rvec(3,nr),Hk(nb,nb),Hamr(nb,nb,nr),ndeg(nr),ene(nb,nk),od(nb,nk,3),H_col(nb))
+      allocate(rvec(3,nr),rvec_data(3,nr),Hk(nb,nb),triv_hr(nb,nb,nr),Top_hr(nb,nb,nr),ndeg(nr),ene(nb,nk),od(nb,nk,3),H_col(nb))
       read(99,*)ndeg
+      do i = 1, 80
+             read(97, *)! Read and discard 80 lines
+      enddo
       do k=1,nr
          do i=1,nb
             do j=1,nb
                read(99,*)rvec(1,k),rvec(2,k),rvec(3,k),i1,i2,a,b
-               hamr(i1,i2,k)=dcmplx(a,b)
+               top_hr(i1,i2,k)=dcmplx(a,b)
+               read(97,*)rvec_data(1,k),rvec_data(2,k),rvec_data(3,k),j1,j2,x1,y1
+               triv_hr(j1,j2,k)=dcmplx(x1,y1)
             enddo
          enddo
       enddo
@@ -103,7 +108,7 @@
                phase=phase+klist(i,k)*rvec(i,j)
             enddo
 
-            HK=HK+Hamr(:,:,j)*dcmplx(cos(phase),-sin(phase))/float(ndeg(j))
+            HK=HK+((1-alpha)*(triv_hr(:,:,j))+alpha*(top_hr(:,:,j)))*dcmplx(cos(phase),-sin(phase))/float(ndeg(j))
 
          enddo
          call zheev('V','U',nb,HK,nb,ene(:,k),work,lwork,rwork,info) 
@@ -146,70 +151,39 @@
       stop
 333   write(*,'(3a)')'ERROR: input file "',trim(adjustl(nnkp)),' not found'
       stop
-444   write(*,'(3a)')'ERROR: input file "',trim(adjustl(hamil_file)),' not found'
+444   write(*,'(3a)')'ERROR: input file "',trim(adjustl(triv_file)),' not found'
       stop
 
       end
 
-     subroutine write_plt(nkp,xkl,kl,ef)
-     implicit none
-     integer nkp,i
-     real*8 xkl(nkp),ef
-     character(len=30)kl(nkp)
-     
-     open(99,file='plt_files/band.plt')
-     write(99,'(a,f12.8)')'ef=',ef
-     write(99,'(a)') 'set xtics ( \'
-     do i=1,nkp
-        if(trim(adjustl(kl(i))).eq.'g'.or.trim(adjustl(kl(i))).eq.'G')kl(i)="{/Symbol \107}"
-        if(i.ne.nkp) write(99,'(3a,f12.6,a)')'"',trim(adjustl(kl(i))),'"',xkl(i),", \"
-        if(i.eq.nkp) write(99,'(3a,f12.6,a)')'"',trim(adjustl(kl(i))),'"',xkl(i)," )"
-
-     enddo
-     write(99,'(a,f12.6,a,f12.6,a)') 'set xrange [ -0.15 : 0.15]'
-     write(99,'(a)') &
-          'set terminal pdfcairo enhanced font "DejaVu"  transparent fontscale 1 size 5.00in, 7.50in'
-     write(99,'(a,f4.2,a)')'set output "pdfs/band.pdf"'
-     write(99,'(12(a,/),a)') &
-          'set encoding iso_8859_1',&
-          'set size ratio 0 1.0,1.0',&
-          'set ylabel "E-E_{CBM} (eV)"',&
-          'set yrange [-2 : 2 ]',&
-          'unset key',&
-          'set ytics 1.0 scale 1 nomirror out',&
-          'set mytics 2',&
-          'set parametric',&
-          'set trange [-10:10]',&
-          'set multiplot',&
-          'plot "band.dat" u 1:($2-ef):(column(3)*1.5) with points pt 7 ps variable lc rgb "blue"',&
-          'plot "band.dat" u 1:($2-ef):(column(4)*1.5) with points pt 7 ps variable lc rgb "red"',&
-          'plot "band.dat" u 1:($2-ef):(column(5)*1.5) with points pt 7 ps variable lc rgb "green"'
-      write(99,'(a)') &
-          'plot "band.dat" u 1:($2-ef) with l lt 1 lw 1.5 lc rgb "yellow",\'
-      do i=2,nkp-1
-         write(99,' (f12.6,a)') xkl(i),',t with l lt 2  lc -1,\'
-          enddo
-      write(99,'(a)') '   t,0 with l lt 2  lc -1'
-      write(99,'(a)') &
-          'unset multiplot'
-      
-
-    end subroutine write_plt
-
-!plot "band.dat" u 1:($2-ef) with l lt 1 lw 3,\
-!    0.000000,t with l lt 2 lc -1,\
-!    t,0 with l lt 2 lc -1
-!plot "band.dat" u 1:($2-ef):(column(3)) with points pt 7 ps variable
-!plot "band.dat" u 1:($2-ef):(column(4)) with points pt 7 ps variable
-!plot "band.dat" u 1:($2-ef):(column(5)) with points pt 7 ps variable
-!unset multiplot
-!------- 2D k-mesh
-!    subroutine construct_kmesh(resolution, tolerance, energy_diff, ene)
-!    implicit none
-!    end subroutine construct_kmesh
-
-
-
-
-
-! ------ gfortran -o wanr2k wanr2k.f90 -lblas -llapack
+      subroutine write_plt(nkp,xkl,kl,ef)
+            implicit none
+            integer nkp,i
+            real*8 xkl(nkp),ef
+            character(len=30)kl(nkp)
+            
+            open(99,file='band.plt')
+            write(99,'(a,f12.8)')'ef=',ef
+            write(99,'(a,f12.6,a,f12.6,a)') 'set xrange [ -0.12 : 0.12]'
+            write(99,'(a)') &
+                 'set terminal pdfcairo enhanced font "DejaVu"  transparent fontscale 1 size 5.00in, 5.00in'
+            write(99,'(a,f4.2,a)')'set output "band.pdf"'
+            write(99,'(14(a,/),a)') &
+                 'set border',&
+                 'unset xtics',&
+                 'unset ytics',&
+                 'set encoding iso_8859_1',&
+                 'set size ratio 0 1.0,1.0',&
+                 'set yrange [-0.4: 0.4 ]',&
+                 'unset key',&
+                 'set mytics 2',&
+                 'set parametric',&
+                 'set trange [-10:10]',&
+                 'set multiplot',&
+                 'plot "band.dat" every 4 u 1:($2-ef):(column(3)*4) with points pt 7 ps variable lc rgb "royalblue"',&
+                 'plot "band.dat" every 4 u 1:($2-ef):(column(4)*4) with points pt 7 ps variable lc rgb "light-red"',&
+                 'plot "band.dat" every 4 u 1:($2-ef):(column(5)*4) with points pt 7 ps variable lc rgb "forest-green"',&
+                 'plot "band.dat" u 1:($2-ef) with l lt 1 lw 3.5 lc rgb "yellow"',&
+                 'unset multiplot'
+       
+           end subroutine write_plt
