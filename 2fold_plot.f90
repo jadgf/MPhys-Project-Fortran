@@ -2,8 +2,8 @@ module parameters
     Implicit None
 !--------to be modified by the user
     character(len=80):: prefix="BiTeI"
-    real*8,parameter::ef= 4.18903772,kxmax=0.03,kymax=0.03,kzmax=0.035,amax=0.05,acritical=0.85
-    integer,parameter::xmeshres=40,ymeshres=40,zmeshres=25,ares=7,nkxpoints=(2*xmeshres+1),nkypoints=(2*ymeshres+1),nkzpoints=(2*zmeshres+1),napoints=(2*ares+1),nbmin=12,nbmax=13,nkp3=nkxpoints*nkypoints*nkzpoints
+    real*8,parameter::ef= 4.18903772,kxmax=0.03,kymax=0.03,kzmax=0.035,amax=0.05,a=0.84
+    integer,parameter::xmeshres=25,ymeshres=25,zmeshres=20,nkxpoints=(2*xmeshres+1),nkypoints=(2*ymeshres+1),nkzpoints=(2*zmeshres+1),nbmin=12,nbmax=13,nkp3=nkxpoints*nkypoints*nkzpoints
     integer nb
     INTEGER IERR,MYID,NUMPROCS
     
@@ -18,7 +18,7 @@ Program Projected_band_structure
     character(len=80) top_file,triv_file,nnkp,line
     integer*4 i,j,k,nr,i1,i2,j1,j2,lwork,info,ikx,iky,ikz,ia,ik,count,kpool,kpmin,kpmax,ecounts,ikp,ir
     real*8,parameter::third=1d0/3d0, two = 2.0d0, sqrt2 = sqrt(two)
-    real*8 phase,pi2,x1,y1,x2,y2,a
+    real*8 phase,pi2,x1,y1,x2,y2
     real*8 avec(3,3),bvec(3,3),kpoint(3,nkp3),rvec_data(3)
     real*8,allocatable:: rvec(:,:),rwork(:)
     real*8, allocatable:: k_ene(:),k_ene_data(:,:),sam(:,:),oam(:,:),kmesh(:,:),energy(:,:),ene(:,:)
@@ -75,7 +75,6 @@ Program Projected_band_structure
     dx=kxmax/xmeshres
 	dy=kymax/ymeshres
     dz=kzmax/zmeshres
-    da=amax/ares
 
 !----- Create header of dx files
 
@@ -114,49 +113,34 @@ Program Projected_band_structure
     allocate(sam(3,nbmin:nbmax), oam(3,nbmin:nbmax), ene(2,kpool),k_ene(nb),energy(2,nkp3))
 
     count=3
-    do ia=-ares,ares
-        print *,'interpolation =',ia+ares,'processor =',myid
-      a=ia*da + acritical
-
-      if(myid.eq.0) then
-          write(100, '(a,i8,a,i8,a,i10,a)') 'object',count,' class array type float rank 1 shape',2,&
-                                       ' item', nkp3, ' data follows'
-      endif
-      count=count+1
-      ikp=0
-      do ik=kpmin,min(kpmax,nkp3)
-         ikp=ikp+1
-        Hk = 0d0
-        do ir=1,nr
-          !phase = kpoint(1,ik)*rvec(1,ir)+kpoint(2,ik)*rvec(2,ir)+kpoint(3,ik)*rvec(3,ir)
-          phase = dot_product(kpoint(:,ik),rvec(:,ir))
-          HK=HK+((1-a)*(triv_Hr(:,:,ir))+(a)*(top_Hr(:,:,ir)))*dcmplx(cos(phase),-sin(phase))/float(ndeg(ir))
-          !HK=HK+(top_Hr(:,:,i)*dcmplx(cos(phase),-sin(phase))/float(ndeg(i)))
-        enddo
-        call zheev('V','U',nb,HK,nb,k_ene,work,lwork,rwork,info)
-        ene(:,ikp)=k_ene(12:13)
-      enddo
-
-        CALL MPI_GATHER( ENE   ,ECOUNTS,MPI_DOUBLE_PRECISION,   &
-                         ENERGY,ECOUNTS,MPI_DOUBLE_PRECISION, &
-                              0,MPI_COMM_WORLD,IERR)
-        if(myid.eq.0)  write(100, '(2(1x,f12.6))') energy
-        if(myid.eq.0)  write(100, '(a)') 'attribute "dep" string "positions"'
-    enddo
+	if(myid.eq.0) then
+		write(100, '(a,i8,a,i8,a,i10,a)') 'object',count,' class array type float rank 1 shape',2,&
+									   ' item', nkp3, ' data follows'
+	endif
+	ikp=0
+	do ik=kpmin,min(kpmax,nkp3)
+		ikp=ikp+1
+		Hk = 0d0
+		do ir=1,nr
+		  !phase = kpoint(1,ik)*rvec(1,ir)+kpoint(2,ik)*rvec(2,ir)+kpoint(3,ik)*rvec(3,ir)
+		  phase = dot_product(kpoint(:,ik),rvec(:,ir))
+		  HK=HK+((1-a)*(triv_Hr(:,:,ir))+(a)*(top_Hr(:,:,ir)))*dcmplx(cos(phase),-sin(phase))/float(ndeg(ir))
+		  !HK=HK+(top_Hr(:,:,i)*dcmplx(cos(phase),-sin(phase))/float(ndeg(i)))
+		enddo
+		call zheev('V','U',nb,HK,nb,k_ene,work,lwork,rwork,info)
+		ene(:,ikp)=k_ene(12:13)
+	enddo
+	CALL MPI_GATHER( ENE   ,ECOUNTS,MPI_DOUBLE_PRECISION,   &
+						 ENERGY,ECOUNTS,MPI_DOUBLE_PRECISION, &
+							  0,MPI_COMM_WORLD,IERR)
+	if(myid.eq.0)  write(100, '(2(1x,f12.6))') energy
 
     if(myid.eq.0) then
-        do i=0,napoints-1
-            write(100,'(A,i8,A,/,A,/,A,/,A,i8,/)') &
-            'object',napoints+3+i,' class field', &
-            'component "positions" value 1', &
-            'component "connections" value 2', &
-            'component "data" value ',3+i
-        enddo
-        write(100, '(a)') 'object "series" class series'
-        do i=0,napoints-1
-            write(100, '(a,i8,a,i8,a,i8)') 'member', i, ' value', (i+napoints+3), ' position', i
-        enddo
-
+		write(100,'(A,/,A,/,A,/,A)') &
+		'object "regular positions regular connections" class field', &
+		'component "positions" value 1', &
+		'component "connections" value 2', &
+		'component "data" value 3'
         write(100, '(A)') 'end'
     endif
     
