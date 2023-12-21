@@ -1,5 +1,5 @@
 //
-// time: Wed Dec 20 23:24:22 2023
+// time: Thu Dec 21 01:24:26 2023
 //
 // version: 3.2.0 (format), 4.4.4 (DX)
 //
@@ -57,8 +57,8 @@ main_Import_1_out_1 =
     //
     // 
     // node Compute[3]: x = 283, y = 274, inputs = 3, label = Compute
-    // input[1]: defaulting = 0, visible = 0, type = 32, value = "and($0.1 >= 5.53, $0.1<=5.84)?select($0,1):5.84"
-    // expression: value = and(a.1 >= 5.53, a.1<=5.84)?select(a,1):5.84
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "and($0.1 >= 0, $0.1<=0.22)?select($0,1):0.22"
+    // expression: value = and(a.1 >= 0, a.1<=0.22)?select(a,1):0.22
     // name[2]: value = a
     // name[3]: value = b
     //
@@ -70,16 +70,16 @@ main_Compute_3_out_1 =
     ) [instance: 3, cache: 1];
     // 
     // node Colormap[1]: x = 494, y = 240, inputs = 19, label = Colormap
-    // input[1]: defaulting = 0, visible = 0, type = 16777224, value = { [0.0 0.65263158] [1.0 0.0] }
-    // input[2]: defaulting = 0, visible = 0, type = 16777224, value = { [0.0062893082 0.98947368] [0.96855346 1.0] [1.0 1.0] }
-    // input[3]: defaulting = 0, visible = 0, type = 16777224, value = { [0.0 1.0] [0.98742138 1.0] }
-    // input[4]: defaulting = 0, visible = 0, type = 16777224, value = { [0.0 1.0] [0.8490566 1.0] [1.0 1.0] }
+    // input[1]: defaulting = 0, visible = 0, type = 16777224, value = { [0.0 1.0] [0.017699115 1.0] [0.028761062 0.6122449] [0.046460177 0.60204082] [0.07300885 0.59183673] [0.099557522 0.35714286] [0.10176991 0.35714286] [0.11725664 0.35714286] [0.15707965 0.62244898] [0.15929204 0.62244898] [0.21017699 0.65306122] [0.23230088 0.65306122] [0.26548673 0.65306122] [0.38716814 0.78571429] [0.39380531 0.79591837] [0.46017699 0.081632653] [0.53097345 0.071428571] [0.86946903 0.98979592] [0.9380531 1.0] }
+    // input[2]: defaulting = 0, visible = 0, type = 16777224, value = { [0.0 1.0] [0.013274336 1.0] [0.013274336 0.0] [0.044247788 0.0] [0.053097345 1.0] [0.068584071 1.0] [0.068584071 0.0] [0.086283186 0.0] [0.092920354 0.0] [0.10176991 1.0] [0.10619469 1.0] [0.10840708 0.0] [0.25663717 0.0] [0.25663717 1.0] [0.27654867 0.98979592] [0.29424779 1.0] [0.29424779 0.0] [0.3119469 0.0] [0.49336283 0.0] [0.49778761 0.98979592] [0.52654867 1.0] [0.53982301 1.0] [0.53982301 0.0] [0.6 0.0] [0.77654867 0.0] [0.90265487 0.0] [0.90265487 1.0] [0.94469027 1.0] [0.94469027 0.0] [0.99336283 0.020408163] [1.0 0.0] }
+    // input[3]: defaulting = 0, visible = 0, type = 16777224, value = { [0.0088495575 0.0] [0.022123894 1.0] [0.030973451 1.0] [0.075221239 0.98989899] [0.090707965 1.0] [0.10176991 0.54545455] [0.11504425 1.0] [0.24557522 0.98989899] [0.26548673 0.52525253] [0.28318584 0.53535354] [0.30309735 0.52525253] [0.30973451 1.0] [0.3119469 1.0] [0.5 1.0] [1.0 1.0] [1.0 0.0] }
+    // input[4]: defaulting = 0, visible = 0, type = 16777224, value = { [0.0 0.48351648] [0.024336283 1.0] [0.46238938 1.0] }
     // input[5]: defaulting = 0, visible = 0, type = 32, value = "Colormap_1"
-    // input[7]: defaulting = 1, visible = 0, type = 5, value = 5.54
-    // input[8]: defaulting = 1, visible = 0, type = 5, value = 5.84
+    // input[7]: defaulting = 1, visible = 0, type = 5, value = 0.0
+    // input[8]: defaulting = 1, visible = 0, type = 5, value = 0.22
     // input[9]: defaulting = 1, visible = 0, type = 1, value = 20
-    // input[12]: defaulting = 0, visible = 0, type = 16777221, value = { 5.54 5.84 }
-    // window: position = (0.6503,0.1996), size = 0.4422x0.4828, screen = 0
+    // input[12]: defaulting = 0, visible = 0, type = 16777221, value = { 0.0 0.22 }
+    // window: position = (0.1211,0.1406), size = 0.4565x0.6481, screen = 0
     //
 main_Colormap_1_out_1[cache: 2],
 main_Colormap_1_out_2[cache: 2] = 
@@ -156,12 +156,12 @@ main_Scale_1_out_1 =
     // input[1]: defaulting = 0, visible = 0, type = 67108863, value = "Image_1"
     // input[4]: defaulting = 0, visible = 0, type = 1, value = 1
     // input[5]: defaulting = 0, visible = 0, type = 8, value = [0 0 0]
-    // input[6]: defaulting = 0, visible = 0, type = 8, value = [-0.0356812 1.32582 6.42246]
-    // input[7]: defaulting = 0, visible = 0, type = 5, value = 3.51441
+    // input[6]: defaulting = 0, visible = 0, type = 8, value = [0.775316 0.329396 7.10014]
+    // input[7]: defaulting = 0, visible = 0, type = 5, value = 3.83165
     // input[8]: defaulting = 0, visible = 0, type = 1, value = 956
     // input[9]: defaulting = 0, visible = 0, type = 5, value = 0.671
-    // input[10]: defaulting = 0, visible = 0, type = 8, value = [-0.28875 0.937315 -0.195099]
-    // input[11]: defaulting = 1, visible = 0, type = 5, value = 30.0
+    // input[10]: defaulting = 0, visible = 0, type = 8, value = [-0.00432588 0.998938 -0.0458712]
+    // input[11]: defaulting = 1, visible = 0, type = 5, value = 30.0001
     // input[12]: defaulting = 0, visible = 0, type = 1, value = 0
     // input[14]: defaulting = 0, visible = 0, type = 1, value = 1
     // input[15]: defaulting = 1, visible = 0, type = 32, value = "none"
@@ -169,13 +169,20 @@ main_Scale_1_out_1 =
     // input[17]: defaulting = 1, visible = 0, type = 1, value = 1
     // input[18]: defaulting = 1, visible = 0, type = 1, value = 1
     // input[19]: defaulting = 0, visible = 0, type = 1, value = 0
-    // input[25]: defaulting = 0, visible = 0, type = 32, value = "/home/felix/Desktop/MPhys-Project-Fortran/2dmeshenergytrivial"
+    // input[22]: defaulting = 0, visible = 0, type = 32, value = "white"
+    // input[25]: defaulting = 0, visible = 0, type = 32, value = "/Users/James/Desktop/hex_color"
     // input[26]: defaulting = 0, visible = 0, type = 32, value = "tiff"
     // input[29]: defaulting = 0, visible = 0, type = 3, value = 1
     // input[30]: defaulting = 0, visible = 0, type = 16777248, value = {"kx", "ky", "E / eV"}
+    // input[31]: defaulting = 0, visible = 0, type = 1, value = 1
+    // input[32]: defaulting = 1, visible = 0, type = 16777224, value = {[0 0 0] [0 0 0]}
+    // input[33]: defaulting = 0, visible = 0, type = 3, value = 1
+    // input[36]: defaulting = 0, visible = 0, type = 3, value = 0
+    // input[37]: defaulting = 0, visible = 0, type = 16777248, value = {"clear", "black", "black", "black"}
+    // input[38]: defaulting = 0, visible = 0, type = 16777248, value = {"background","grid","ticks","labels"}
     // input[41]: defaulting = 0, visible = 0, type = 32, value = "rotate"
     // depth: value = 24
-    // window: position = (0.2224,0.0944), size = 0.6599x0.7328, screen = 0
+    // window: position = (0.1646,0.0429), size = 0.6599x0.7328, screen = 0
     // internal caching: 1
     //
 main_Image_1_out_1,
@@ -264,12 +271,12 @@ main_Scalar_1_in_9 = NULL;
 main_Scalar_1_in_10 = NULL;
 main_Scalar_1_in_11 = NULL;
 main_Scalar_1_out_1 = 7.0 ;
-main_Compute_3_in_1 = "and($0.1 >= 5.53, $0.1<=5.84)?select($0,1):5.84";
+main_Compute_3_in_1 = "and($0.1 >= 0, $0.1<=0.22)?select($0,1):0.22";
 main_Compute_3_out_1 = NULL;
-main_Colormap_1_in_1 = { [0.0 0.65263158] [1.0 0.0] };
-main_Colormap_1_in_2 = { [0.0062893082 0.98947368] [0.96855346 1.0] [1.0 1.0] };
-main_Colormap_1_in_3 = { [0.0 1.0] [0.98742138 1.0] };
-main_Colormap_1_in_4 = { [0.0 1.0] [0.8490566 1.0] [1.0 1.0] };
+main_Colormap_1_in_1 = { [0.0 1.0] [0.017699115 1.0] [0.028761062 0.6122449] [0.046460177 0.60204082] [0.07300885 0.59183673] [0.099557522 0.35714286] [0.10176991 0.35714286] [0.11725664 0.35714286] [0.15707965 0.62244898] [0.15929204 0.62244898] [0.21017699 0.65306122] [0.23230088 0.65306122] [0.26548673 0.65306122] [0.38716814 0.78571429] [0.39380531 0.79591837] [0.46017699 0.081632653] [0.53097345 0.071428571] [0.86946903 0.98979592] [0.9380531 1.0] };
+main_Colormap_1_in_2 = { [0.0 1.0] [0.013274336 1.0] [0.013274336 0.0] [0.044247788 0.0] [0.053097345 1.0] [0.068584071 1.0] [0.068584071 0.0] [0.086283186 0.0] [0.092920354 0.0] [0.10176991 1.0] [0.10619469 1.0] [0.10840708 0.0] [0.25663717 0.0] [0.25663717 1.0] [0.27654867 0.98979592] [0.29424779 1.0] [0.29424779 0.0] [0.3119469 0.0] [0.49336283 0.0] [0.49778761 0.98979592] [0.52654867 1.0] [0.53982301 1.0] [0.53982301 0.0] [0.6 0.0] [0.77654867 0.0] [0.90265487 0.0] [0.90265487 1.0] [0.94469027 1.0] [0.94469027 0.0] [0.99336283 0.020408163] [1.0 0.0] };
+main_Colormap_1_in_3 = { [0.0088495575 0.0] [0.022123894 1.0] [0.030973451 1.0] [0.075221239 0.98989899] [0.090707965 1.0] [0.10176991 0.54545455] [0.11504425 1.0] [0.24557522 0.98989899] [0.26548673 0.52525253] [0.28318584 0.53535354] [0.30309735 0.52525253] [0.30973451 1.0] [0.3119469 1.0] [0.5 1.0] [1.0 1.0] [1.0 0.0] };
+main_Colormap_1_in_4 = { [0.0 0.48351648] [0.024336283 1.0] [0.46238938 1.0] };
 main_Colormap_1_in_5 = "Colormap_1";
 main_Colormap_1_in_6 = NULL;
 main_Colormap_1_in_7 = NULL;
@@ -277,7 +284,7 @@ main_Colormap_1_in_8 = NULL;
 main_Colormap_1_in_9 = NULL;
 main_Colormap_1_in_10 = NULL;
 main_Colormap_1_in_11 = NULL;
-main_Colormap_1_in_12 = { 5.54 5.84 };
+main_Colormap_1_in_12 = { 0.0 0.22 };
 main_Colormap_1_in_13 = NULL;
 main_Colormap_1_in_14 = NULL;
 main_Colormap_1_in_15 = NULL;
@@ -618,11 +625,11 @@ main_Image_1_in_1 = "Image_1";
 main_Image_1_in_3 = "X24,,";
 main_Image_1_in_4 = 1;
 main_Image_1_in_5 = [0 0 0];
-main_Image_1_in_6 = [-0.0356812 1.32582 6.42246];
-main_Image_1_in_7 = 3.51441;
+main_Image_1_in_6 = [0.775316 0.329396 7.10014];
+main_Image_1_in_7 = 3.83165;
 main_Image_1_in_8 = 956;
 main_Image_1_in_9 = 0.671;
-main_Image_1_in_10 = [-0.28875 0.937315 -0.195099];
+main_Image_1_in_10 = [-0.00432588 0.998938 -0.0458712];
 main_Image_1_in_11 = NULL;
 main_Image_1_in_12 = 0;
 main_Image_1_in_13 = NULL;
@@ -634,22 +641,22 @@ main_Image_1_in_18 = NULL;
 main_Image_1_in_19 = 0;
 main_Image_1_in_20 = NULL;
 main_Image_1_in_21 = NULL;
-main_Image_1_in_22 = NULL;
+main_Image_1_in_22 = "white";
 main_Image_1_in_23 = NULL;
-main_Image_1_in_25 = "/home/felix/Desktop/MPhys-Project-Fortran/2dmeshenergytrivial";
+main_Image_1_in_25 = "/Users/James/Desktop/hex_color";
 main_Image_1_in_26 = "tiff";
 main_Image_1_in_27 = NULL;
 main_Image_1_in_28 = NULL;
 main_Image_1_in_29 = 1;
 main_Image_1_in_30 = {"kx", "ky", "E / eV"};
-main_Image_1_in_31 = NULL;
+main_Image_1_in_31 = 1;
 main_Image_1_in_32 = NULL;
-main_Image_1_in_33 = NULL;
+main_Image_1_in_33 = 1;
 main_Image_1_in_34 = NULL;
 main_Image_1_in_35 = NULL;
-main_Image_1_in_36 = NULL;
-main_Image_1_in_37 = NULL;
-main_Image_1_in_38 = NULL;
+main_Image_1_in_36 = 0;
+main_Image_1_in_37 = {"clear", "black", "black", "black"};
+main_Image_1_in_38 = {"background","grid","ticks","labels"};
 main_Image_1_in_39 = NULL;
 main_Image_1_in_40 = NULL;
 main_Image_1_in_41 = "rotate";
