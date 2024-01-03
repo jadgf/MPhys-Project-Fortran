@@ -1,5 +1,5 @@
 //
-// time: Thu Dec 21 13:55:22 2023
+// time: Wed Jan  3 19:35:38 2024
 //
 // version: 3.2.0 (format), 4.4.4 (DX)
 //
@@ -9,26 +9,33 @@
 include "Arrow3dMacro2.net"
 //
 // MODULE main
-// workspace: width = 574, height = 708
+// workspace: width = 934, height = 756
 // layout: snap = 0, width = 50, height = 50, align = NN
 //
 macro main(
 ) -> (
 ) {
     // 
-    // node Arrow3D[1]: x = 316, y = 371, inputs = 0, label = Arrow3D
+    // node Arrow3D[1]: x = 690, y = 375, inputs = 0, label = Arrow3D
     //
 main_Arrow3D_1_out_1 = 
     Arrow3D(
 
     ) [instance: 1, cache: 1];
     // 
-    // node FileSelector[1]: x = 208, y = 63, inputs = 0, label = FileSelector
-    // output[1]: visible = 1, type = 32, value = "/home/felix/Desktop/MPhys-Project-Fortran/oam.dx"
-    // output[2]: visible = 1, type = 32, value = "oam.dx"
+    // node Arrow3D[2]: x = 317, y = 356, inputs = 0, label = Arrow3D
+    //
+main_Arrow3D_2_out_1 = 
+    Arrow3D(
+
+    ) [instance: 2, cache: 1];
+    // 
+    // node FileSelector[1]: x = 241, y = 0, inputs = 0, label = FileSelector
+    // output[1]: visible = 1, type = 32, value = "/home/felix/Desktop/MPhys-Project-Fortran/sam1314triv.dx"
+    // output[2]: visible = 1, type = 32, value = "sam1314triv.dx"
     //
     // 
-    // node Import[1]: x = 233, y = 141, inputs = 6, label = Import
+    // node Import[1]: x = 354, y = 93, inputs = 6, label = Import
     //
 main_Import_1_out_1 = 
     Import(
@@ -40,7 +47,126 @@ main_Import_1_out_1 =
     main_Import_1_in_6
     ) [instance: 1, cache: 1];
     // 
-    // node Compute[2]: x = 381, y = 153, inputs = 3, label = Compute
+    // node Compute[13]: x = 210, y = 144, inputs = 3, label = Compute
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "$0.5"
+    // expression: value = a.5
+    // name[2]: value = a
+    // name[3]: value = b
+    //
+main_Compute_13_out_1 = 
+    Compute(
+    main_Compute_13_in_1,
+    main_Import_1_out_1,
+    main_Compute_13_in_3
+    ) [instance: 13, cache: 1];
+    // 
+    // node Scalar[3]: x = 334, y = 250, inputs = 11, label = Scalar
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "Scalar_3"
+    // input[3]: defaulting = 0, visible = 0, type = 5, value = 6.0 
+    // input[5]: defaulting = 1, visible = 0, type = 5, value = -1000000.0
+    // input[6]: defaulting = 1, visible = 0, type = 5, value = 1000000.0
+    // input[7]: defaulting = 1, visible = 0, type = 5, value = 1.0
+    // input[9]: defaulting = 1, visible = 0, type = 1, value = 5
+    // output[1]: visible = 1, type = 5, value = 6.0 
+    //
+    // 
+    // node Compute[14]: x = 215, y = 255, inputs = 4, label = Compute
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "$0>0?(($0*$1)*[1,0,0]+(1-($0*$1))*[1,1,1]):(abs($0*$1)*[0,0,1]+(1-abs($0*$1))*[1,1,1])"
+    // expression: value = a>0?((a*b)*[1,0,0]+(1-(a*b))*[1,1,1]):(abs(a*b)*[0,0,1]+(1-abs(a*b))*[1,1,1])
+    // name[2]: value = a
+    // name[3]: value = b
+    // name[4]: value = c
+    //
+main_Compute_14_out_1 = 
+    Compute(
+    main_Compute_14_in_1,
+    main_Compute_13_out_1,
+    main_Scalar_3_out_1,
+    main_Compute_14_in_4
+    ) [instance: 14, cache: 1];
+    // 
+    // node Compute[15]: x = 51, y = 161, inputs = 3, label = Compute
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "[$0.3,$0.4,$0.5]"
+    // expression: value = [a.3,a.4,a.5]
+    // name[2]: value = a
+    // name[3]: value = b
+    //
+main_Compute_15_out_1 = 
+    Compute(
+    main_Compute_15_in_1,
+    main_Import_1_out_1,
+    main_Compute_15_in_3
+    ) [instance: 15, cache: 1];
+    // 
+    // node Replace[2]: x = 17, y = 282, inputs = 4, label = Replace
+    // input[3]: defaulting = 0, visible = 1, type = 32, value = "data"
+    // input[4]: defaulting = 0, visible = 1, type = 32, value = "colors"
+    //
+main_Replace_2_out_1 = 
+    Replace(
+    main_Compute_14_out_1,
+    main_Compute_15_out_1,
+    main_Replace_2_in_3,
+    main_Replace_2_in_4
+    ) [instance: 2, cache: 1];
+    // 
+    // node Sample[2]: x = 157, y = 384, inputs = 2, label = Sample
+    // input[2]: defaulting = 0, visible = 1, type = 1, value = 200
+    //
+main_Sample_2_out_1 = 
+    Sample(
+    main_Replace_2_out_1,
+    main_Sample_2_in_2
+    ) [instance: 2, cache: 1];
+    // 
+    // node Mark[4]: x = 280, y = 503, inputs = 2, label = Mark
+    // input[2]: defaulting = 0, visible = 1, type = 32, value = "positions"
+    //
+main_Mark_4_out_1 = 
+    Mark(
+    main_Arrow3D_2_out_1,
+    main_Mark_4_in_2
+    ) [instance: 4, cache: 1];
+    // 
+    // node Compute[16]: x = 180, y = 479, inputs = 3, label = Compute
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "[$0.0,($0.1-0.5),$0.2]"
+    // expression: value = [a.0,(a.1-0.5),a.2]
+    // name[2]: value = a
+    // name[3]: value = b
+    //
+main_Compute_16_out_1 = 
+    Compute(
+    main_Compute_16_in_1,
+    main_Mark_4_out_1,
+    main_Compute_16_in_3
+    ) [instance: 16, cache: 1];
+    // 
+    // node Unmark[3]: x = 173, y = 549, inputs = 2, label = Unmark
+    //
+main_Unmark_3_out_1 = 
+    Unmark(
+    main_Compute_16_out_1,
+    main_Unmark_3_in_2
+    ) [instance: 3, cache: 1];
+    // 
+    // node AutoGlyph[2]: x = 36, y = 531, inputs = 7, label = AutoGlyph
+    // input[3]: defaulting = 0, visible = 1, type = 5, value = 7.0
+    // input[4]: defaulting = 0, visible = 1, type = 5, value = 1.7
+    // input[5]: defaulting = 0, visible = 1, type = 5, value = 0.0
+    // input[6]: defaulting = 0, visible = 0, type = 5, value = 0.0
+    //
+main_AutoGlyph_2_out_1 = 
+    AutoGlyph(
+    main_Sample_2_out_1,
+    main_Unmark_3_out_1,
+    main_AutoGlyph_2_in_3,
+    main_AutoGlyph_2_in_4,
+    main_AutoGlyph_2_in_5,
+    main_AutoGlyph_2_in_6,
+    main_AutoGlyph_2_in_7
+    ) [instance: 2, cache: 1];
+    // 
+    // node Compute[2]: x = 776, y = 157, inputs = 3, label = Compute
     // input[1]: defaulting = 0, visible = 0, type = 32, value = "$0.2"
     // expression: value = a.2
     // name[2]: value = a
@@ -53,7 +179,7 @@ main_Compute_2_out_1 =
     main_Compute_2_in_3
     ) [instance: 2, cache: 1];
     // 
-    // node Scalar[2]: x = 488, y = 194, inputs = 11, label = Scalar
+    // node Scalar[2]: x = 865, y = 198, inputs = 11, label = Scalar
     // input[1]: defaulting = 0, visible = 0, type = 32, value = "Scalar_2"
     // input[3]: defaulting = 0, visible = 0, type = 5, value = 10.0 
     // input[5]: defaulting = 1, visible = 0, type = 5, value = -1000000.0
@@ -63,7 +189,7 @@ main_Compute_2_out_1 =
     // output[1]: visible = 1, type = 5, value = 10.0 
     //
     // 
-    // node Compute[6]: x = 362, y = 272, inputs = 4, label = Compute
+    // node Compute[6]: x = 729, y = 276, inputs = 4, label = Compute
     // input[1]: defaulting = 0, visible = 0, type = 32, value = "$0>0?(($0*$1)*[1,0,0]+(1-($0*$1))*[1,1,1]):(abs($0*$1)*[0,0,1]+(1-abs($0*$1))*[1,1,1])"
     // expression: value = a>0?((a*b)*[1,0,0]+(1-(a*b))*[1,1,1]):(abs(a*b)*[0,0,1]+(1-abs(a*b))*[1,1,1])
     // name[2]: value = a
@@ -78,7 +204,7 @@ main_Compute_6_out_1 =
     main_Compute_6_in_4
     ) [instance: 6, cache: 1];
     // 
-    // node Compute[1]: x = 238, y = 230, inputs = 3, label = Compute
+    // node Compute[1]: x = 537, y = 190, inputs = 3, label = Compute
     // input[1]: defaulting = 0, visible = 0, type = 32, value = "[$0.0,$0.1,$0.2]"
     // expression: value = [a.0,a.1,a.2]
     // name[2]: value = a
@@ -91,7 +217,7 @@ main_Compute_1_out_1 =
     main_Compute_1_in_3
     ) [instance: 1, cache: 1];
     // 
-    // node Replace[1]: x = 178, y = 327, inputs = 4, label = Replace
+    // node Replace[1]: x = 517, y = 279, inputs = 4, label = Replace
     // input[3]: defaulting = 0, visible = 1, type = 32, value = "data"
     // input[4]: defaulting = 0, visible = 1, type = 32, value = "colors"
     //
@@ -103,8 +229,8 @@ main_Replace_1_out_1 =
     main_Replace_1_in_4
     ) [instance: 1, cache: 1];
     // 
-    // node Sample[1]: x = 220, y = 409, inputs = 2, label = Sample
-    // input[2]: defaulting = 0, visible = 1, type = 1, value = 500
+    // node Sample[1]: x = 540, y = 362, inputs = 2, label = Sample
+    // input[2]: defaulting = 0, visible = 1, type = 1, value = 200
     //
 main_Sample_1_out_1 = 
     Sample(
@@ -112,7 +238,7 @@ main_Sample_1_out_1 =
     main_Sample_1_in_2
     ) [instance: 1, cache: 1];
     // 
-    // node Mark[3]: x = 457, y = 396, inputs = 2, label = Mark
+    // node Mark[3]: x = 844, y = 400, inputs = 2, label = Mark
     // input[2]: defaulting = 0, visible = 1, type = 32, value = "positions"
     //
 main_Mark_3_out_1 = 
@@ -121,7 +247,7 @@ main_Mark_3_out_1 =
     main_Mark_3_in_2
     ) [instance: 3, cache: 1];
     // 
-    // node Compute[12]: x = 505, y = 469, inputs = 3, label = Compute
+    // node Compute[12]: x = 865, y = 473, inputs = 3, label = Compute
     // input[1]: defaulting = 0, visible = 0, type = 32, value = "[$0.0,$0.1-0.5,$0.2]"
     // expression: value = [a.0,a.1-0.5,a.2]
     // name[2]: value = a
@@ -134,7 +260,7 @@ main_Compute_12_out_1 =
     main_Compute_12_in_3
     ) [instance: 12, cache: 1];
     // 
-    // node Unmark[2]: x = 425, y = 503, inputs = 2, label = Unmark
+    // node Unmark[2]: x = 785, y = 507, inputs = 2, label = Unmark
     //
 main_Unmark_2_out_1 = 
     Unmark(
@@ -142,44 +268,52 @@ main_Unmark_2_out_1 =
     main_Unmark_2_in_2
     ) [instance: 2, cache: 1];
     // 
-    // node AutoGlyph[1]: x = 285, y = 561, inputs = 7, label = AutoGlyph
+    // node AutoGlyph[3]: x = 449, y = 569, inputs = 7, label = AutoGlyph
     // input[3]: defaulting = 0, visible = 1, type = 5, value = 7.0
-    // input[4]: defaulting = 0, visible = 1, type = 5, value = 1.5
+    // input[4]: defaulting = 0, visible = 1, type = 5, value = 1.7
+    // input[5]: defaulting = 0, visible = 1, type = 5, value = 0.0
+    // input[6]: defaulting = 0, visible = 0, type = 5, value = 0.0
     //
-main_AutoGlyph_1_out_1 = 
+main_AutoGlyph_3_out_1 = 
     AutoGlyph(
     main_Sample_1_out_1,
     main_Unmark_2_out_1,
-    main_AutoGlyph_1_in_3,
-    main_AutoGlyph_1_in_4,
-    main_AutoGlyph_1_in_5,
-    main_AutoGlyph_1_in_6,
-    main_AutoGlyph_1_in_7
-    ) [instance: 1, cache: 1];
+    main_AutoGlyph_3_in_3,
+    main_AutoGlyph_3_in_4,
+    main_AutoGlyph_3_in_5,
+    main_AutoGlyph_3_in_6,
+    main_AutoGlyph_3_in_7
+    ) [instance: 3, cache: 1];
     // 
-    // node Shade[2]: x = 250, y = 645, inputs = 8, label = Shade
+    // node Shade[4]: x = 635, y = 561, inputs = 8, label = Shade
+    // input[2]: defaulting = 0, visible = 1, type = 3, value = 1
+    // input[3]: defaulting = 0, visible = 1, type = 32, value = "smooth"
+    // input[4]: defaulting = 0, visible = 0, type = 5, value = 15.0
+    // input[5]: defaulting = 0, visible = 0, type = 1, value = 60
+    // input[6]: defaulting = 0, visible = 0, type = 5, value = 1.
+    // input[7]: defaulting = 0, visible = 0, type = 5, value = 2.0
     //
-main_Shade_2_out_1 = 
+main_Shade_4_out_1 = 
     Shade(
-    main_AutoGlyph_1_out_1,
-    main_Shade_2_in_2,
-    main_Shade_2_in_3,
-    main_Shade_2_in_4,
-    main_Shade_2_in_5,
-    main_Shade_2_in_6,
-    main_Shade_2_in_7,
-    main_Shade_2_in_8
-    ) [instance: 2, cache: 1];
+    main_AutoGlyph_3_out_1,
+    main_Shade_4_in_2,
+    main_Shade_4_in_3,
+    main_Shade_4_in_4,
+    main_Shade_4_in_5,
+    main_Shade_4_in_6,
+    main_Shade_4_in_7,
+    main_Shade_4_in_8
+    ) [instance: 4, cache: 1];
     // 
-    // node Image[1]: x = 348, y = 646, inputs = 49, label = Image
+    // node Image[1]: x = 723, y = 650, inputs = 49, label = Image
     // input[1]: defaulting = 0, visible = 0, type = 67108863, value = "Image_1"
     // input[4]: defaulting = 0, visible = 0, type = 1, value = 1
-    // input[5]: defaulting = 0, visible = 0, type = 8, value = [-2.86847e-06 2.90573e-07 -2.6552e-06]
-    // input[6]: defaulting = 0, visible = 0, type = 8, value = [-2.86847e-06 2.90573e-07 1.30292]
-    // input[7]: defaulting = 0, visible = 0, type = 5, value = 0.698234
-    // input[8]: defaulting = 0, visible = 0, type = 1, value = 954
-    // input[9]: defaulting = 0, visible = 0, type = 5, value = 0.832
-    // input[10]: defaulting = 0, visible = 0, type = 8, value = [0 1 0]
+    // input[5]: defaulting = 0, visible = 0, type = 8, value = [-1.27405e-06 -9.79751e-06 2.36742e-06]
+    // input[6]: defaulting = 0, visible = 0, type = 8, value = [0.060898 0.0504836 1.10261]
+    // input[7]: defaulting = 1, visible = 0, type = 5, value = 0.592404
+    // input[8]: defaulting = 0, visible = 0, type = 1, value = 946
+    // input[9]: defaulting = 0, visible = 0, type = 5, value = 0.994
+    // input[10]: defaulting = 0, visible = 0, type = 8, value = [-0.0146198 0.998883 -0.0449361]
     // input[11]: defaulting = 0, visible = 0, type = 5, value = 30.0
     // input[12]: defaulting = 0, visible = 0, type = 1, value = 1
     // input[14]: defaulting = 0, visible = 0, type = 1, value = 1
@@ -198,7 +332,7 @@ main_Shade_2_out_1 =
     // input[38]: defaulting = 0, visible = 0, type = 16777248, value = {"background", "grid", "ticks", "labels"}
     // input[41]: defaulting = 0, visible = 0, type = 32, value = "rotate"
     // depth: value = 24
-    // window: position = (0.4854,0.1287), size = 0.5042x0.7731
+    // window: position = (-0.0052,-0.0037), size = 0.5000x0.4546
     // internal caching: 1
     //
 main_Image_1_out_1,
@@ -206,7 +340,7 @@ main_Image_1_out_2,
 main_Image_1_out_3 = 
     Image(
     main_Image_1_in_1,
-    main_Shade_2_out_1,
+    main_Shade_4_out_1,
     main_Image_1_in_3,
     main_Image_1_in_4,
     main_Image_1_in_5,
@@ -255,17 +389,172 @@ main_Image_1_out_3 =
     main_Image_1_in_48,
     main_Image_1_in_49
     ) [instance: 1, cache: 1];
+    // 
+    // node Shade[3]: x = 31, y = 613, inputs = 8, label = Shade
+    // input[2]: defaulting = 0, visible = 1, type = 3, value = 1
+    // input[3]: defaulting = 0, visible = 1, type = 32, value = "smooth"
+    // input[4]: defaulting = 0, visible = 0, type = 5, value = 15.0
+    // input[5]: defaulting = 0, visible = 0, type = 1, value = 60
+    // input[6]: defaulting = 0, visible = 0, type = 5, value = 1.
+    // input[7]: defaulting = 0, visible = 0, type = 5, value = 2.0
+    //
+main_Shade_3_out_1 = 
+    Shade(
+    main_AutoGlyph_2_out_1,
+    main_Shade_3_in_2,
+    main_Shade_3_in_3,
+    main_Shade_3_in_4,
+    main_Shade_3_in_5,
+    main_Shade_3_in_6,
+    main_Shade_3_in_7,
+    main_Shade_3_in_8
+    ) [instance: 3, cache: 1];
+    // 
+    // node Image[2]: x = 221, y = 694, inputs = 49, label = Image
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "Image_2"
+    // input[4]: defaulting = 0, visible = 0, type = 1, value = 1
+    // input[5]: defaulting = 0, visible = 0, type = 8, value = [-4.41372e-05 -1.02967e-05 -1.09989e-06]
+    // input[6]: defaulting = 0, visible = 0, type = 8, value = [-4.41372e-05 -1.02967e-05 1.10341]
+    // input[7]: defaulting = 1, visible = 0, type = 5, value = 0.591316
+    // input[8]: defaulting = 0, visible = 0, type = 1, value = 946
+    // input[9]: defaulting = 0, visible = 0, type = 5, value = 0.994
+    // input[10]: defaulting = 0, visible = 0, type = 8, value = [0 1 0]
+    // input[11]: defaulting = 0, visible = 0, type = 5, value = 30.0
+    // input[12]: defaulting = 0, visible = 0, type = 1, value = 1
+    // input[14]: defaulting = 0, visible = 0, type = 1, value = 1
+    // input[15]: defaulting = 1, visible = 0, type = 32, value = "none"
+    // input[16]: defaulting = 1, visible = 0, type = 32, value = "none"
+    // input[17]: defaulting = 1, visible = 0, type = 1, value = 1
+    // input[18]: defaulting = 1, visible = 0, type = 1, value = 1
+    // input[19]: defaulting = 0, visible = 0, type = 1, value = 0
+    // input[22]: defaulting = 0, visible = 0, type = 32, value = "WHITE"
+    // input[29]: defaulting = 0, visible = 0, type = 3, value = 0
+    // input[30]: defaulting = 0, visible = 0, type = 16777248, value = {"kx", "ky", ""}
+    // input[31]: defaulting = 1, visible = 0, type = 1, value = -10
+    // input[32]: defaulting = 0, visible = 0, type = 16777224, value = {[-0.2 -0.2 0] [0.2 0.2 0]}
+    // input[33]: defaulting = 0, visible = 0, type = 3, value = 1
+    // input[37]: defaulting = 0, visible = 0, type = 16777248, value = {"clear", "grey5", "black", "black"}
+    // input[38]: defaulting = 0, visible = 0, type = 16777248, value = {"background", "grid", "ticks", "labels"}
+    // input[41]: defaulting = 0, visible = 0, type = 32, value = "rotate"
+    // depth: value = 24
+    // window: position = (0.4948,-0.0037), size = 0.5000x0.4546
+    // internal caching: 1
+    //
+main_Image_2_out_1,
+main_Image_2_out_2,
+main_Image_2_out_3 = 
+    Image(
+    main_Image_2_in_1,
+    main_Shade_3_out_1,
+    main_Image_2_in_3,
+    main_Image_2_in_4,
+    main_Image_2_in_5,
+    main_Image_2_in_6,
+    main_Image_2_in_7,
+    main_Image_2_in_8,
+    main_Image_2_in_9,
+    main_Image_2_in_10,
+    main_Image_2_in_11,
+    main_Image_2_in_12,
+    main_Image_2_in_13,
+    main_Image_2_in_14,
+    main_Image_2_in_15,
+    main_Image_2_in_16,
+    main_Image_2_in_17,
+    main_Image_2_in_18,
+    main_Image_2_in_19,
+    main_Image_2_in_20,
+    main_Image_2_in_21,
+    main_Image_2_in_22,
+    main_Image_2_in_23,
+    main_Image_2_in_24,
+    main_Image_2_in_25,
+    main_Image_2_in_26,
+    main_Image_2_in_27,
+    main_Image_2_in_28,
+    main_Image_2_in_29,
+    main_Image_2_in_30,
+    main_Image_2_in_31,
+    main_Image_2_in_32,
+    main_Image_2_in_33,
+    main_Image_2_in_34,
+    main_Image_2_in_35,
+    main_Image_2_in_36,
+    main_Image_2_in_37,
+    main_Image_2_in_38,
+    main_Image_2_in_39,
+    main_Image_2_in_40,
+    main_Image_2_in_41,
+    main_Image_2_in_42,
+    main_Image_2_in_43,
+    main_Image_2_in_44,
+    main_Image_2_in_45,
+    main_Image_2_in_46,
+    main_Image_2_in_47,
+    main_Image_2_in_48,
+    main_Image_2_in_49
+    ) [instance: 2, cache: 1];
+    // 
+    // node Reduce[1]: x = 41, y = 386, inputs = 2, label = Reduce
+    // input[2]: defaulting = 0, visible = 1, type = 16777221, value = { 9.0 }
+    //
+main_Reduce_1_out_1 = 
+    Reduce(
+    main_Replace_2_out_1,
+    main_Reduce_1_in_2
+    ) [instance: 1, cache: 1];
 // network: end of macro body
 CacheScene(main_Image_1_in_1, main_Image_1_out_1, main_Image_1_out_2);
+CacheScene(main_Image_2_in_1, main_Image_2_out_1, main_Image_2_out_2);
 }
 main_Arrow3D_1_out_1 = NULL;
-main_FileSelector_1_out_1 = "/home/felix/Desktop/MPhys-Project-Fortran/oam.dx";
+main_Arrow3D_2_out_1 = NULL;
+main_FileSelector_1_out_1 = "/home/felix/Desktop/MPhys-Project-Fortran/sam1314triv.dx";
 main_Import_1_in_2 = NULL;
 main_Import_1_in_3 = NULL;
 main_Import_1_in_4 = NULL;
 main_Import_1_in_5 = NULL;
 main_Import_1_in_6 = NULL;
 main_Import_1_out_1 = NULL;
+main_Compute_13_in_1 = "$0.5";
+main_Compute_13_in_3 = NULL;
+main_Compute_13_out_1 = NULL;
+main_Scalar_3_in_1 = "Scalar_3";
+main_Scalar_3_in_2 = NULL;
+main_Scalar_3_in_3 = 6.0 ;
+main_Scalar_3_in_4 = NULL;
+main_Scalar_3_in_5 = NULL;
+main_Scalar_3_in_6 = NULL;
+main_Scalar_3_in_7 = NULL;
+main_Scalar_3_in_8 = NULL;
+main_Scalar_3_in_9 = NULL;
+main_Scalar_3_in_10 = NULL;
+main_Scalar_3_in_11 = NULL;
+main_Scalar_3_out_1 = 6.0 ;
+main_Compute_14_in_1 = "$0>0?(($0*$1)*[1,0,0]+(1-($0*$1))*[1,1,1]):(abs($0*$1)*[0,0,1]+(1-abs($0*$1))*[1,1,1])";
+main_Compute_14_in_4 = NULL;
+main_Compute_14_out_1 = NULL;
+main_Compute_15_in_1 = "[$0.3,$0.4,$0.5]";
+main_Compute_15_in_3 = NULL;
+main_Compute_15_out_1 = NULL;
+main_Replace_2_in_3 = "data";
+main_Replace_2_in_4 = "colors";
+main_Replace_2_out_1 = NULL;
+main_Sample_2_in_2 = 200;
+main_Sample_2_out_1 = NULL;
+main_Mark_4_in_2 = "positions";
+main_Mark_4_out_1 = NULL;
+main_Compute_16_in_1 = "[$0.0,($0.1-0.5),$0.2]";
+main_Compute_16_in_3 = NULL;
+main_Compute_16_out_1 = NULL;
+main_Unmark_3_in_2 = NULL;
+main_Unmark_3_out_1 = NULL;
+main_AutoGlyph_2_in_3 = 7.0;
+main_AutoGlyph_2_in_4 = 1.7;
+main_AutoGlyph_2_in_5 = 0.0;
+main_AutoGlyph_2_in_6 = 0.0;
+main_AutoGlyph_2_in_7 = NULL;
+main_AutoGlyph_2_out_1 = NULL;
 main_Compute_2_in_1 = "$0.2";
 main_Compute_2_in_3 = NULL;
 main_Compute_2_out_1 = NULL;
@@ -290,7 +579,7 @@ main_Compute_1_out_1 = NULL;
 main_Replace_1_in_3 = "data";
 main_Replace_1_in_4 = "colors";
 main_Replace_1_out_1 = NULL;
-main_Sample_1_in_2 = 500;
+main_Sample_1_in_2 = 200;
 main_Sample_1_out_1 = NULL;
 main_Mark_3_in_2 = "positions";
 main_Mark_3_out_1 = NULL;
@@ -299,20 +588,20 @@ main_Compute_12_in_3 = NULL;
 main_Compute_12_out_1 = NULL;
 main_Unmark_2_in_2 = NULL;
 main_Unmark_2_out_1 = NULL;
-main_AutoGlyph_1_in_3 = 7.0;
-main_AutoGlyph_1_in_4 = 1.5;
-main_AutoGlyph_1_in_5 = NULL;
-main_AutoGlyph_1_in_6 = NULL;
-main_AutoGlyph_1_in_7 = NULL;
-main_AutoGlyph_1_out_1 = NULL;
-main_Shade_2_in_2 = NULL;
-main_Shade_2_in_3 = NULL;
-main_Shade_2_in_4 = NULL;
-main_Shade_2_in_5 = NULL;
-main_Shade_2_in_6 = NULL;
-main_Shade_2_in_7 = NULL;
-main_Shade_2_in_8 = NULL;
-main_Shade_2_out_1 = NULL;
+main_AutoGlyph_3_in_3 = 7.0;
+main_AutoGlyph_3_in_4 = 1.7;
+main_AutoGlyph_3_in_5 = 0.0;
+main_AutoGlyph_3_in_6 = 0.0;
+main_AutoGlyph_3_in_7 = NULL;
+main_AutoGlyph_3_out_1 = NULL;
+main_Shade_4_in_2 = 1;
+main_Shade_4_in_3 = "smooth";
+main_Shade_4_in_4 = 15.0;
+main_Shade_4_in_5 = 60;
+main_Shade_4_in_6 = 1.;
+main_Shade_4_in_7 = 2.0;
+main_Shade_4_in_8 = NULL;
+main_Shade_4_out_1 = NULL;
 macro Image(
         id,
         object,
@@ -628,12 +917,12 @@ macro Image(
 main_Image_1_in_1 = "Image_1";
 main_Image_1_in_3 = "X24,,";
 main_Image_1_in_4 = 1;
-main_Image_1_in_5 = [-2.86847e-06 2.90573e-07 -2.6552e-06];
-main_Image_1_in_6 = [-2.86847e-06 2.90573e-07 1.30292];
-main_Image_1_in_7 = 0.698234;
-main_Image_1_in_8 = 954;
-main_Image_1_in_9 = 0.832;
-main_Image_1_in_10 = [0 1 0];
+main_Image_1_in_5 = [-1.27405e-06 -9.79751e-06 2.36742e-06];
+main_Image_1_in_6 = [0.060898 0.0504836 1.10261];
+main_Image_1_in_7 = NULL;
+main_Image_1_in_8 = 946;
+main_Image_1_in_9 = 0.994;
+main_Image_1_in_10 = [-0.0146198 0.998883 -0.0449361];
 main_Image_1_in_11 = 30.0;
 main_Image_1_in_12 = 1;
 main_Image_1_in_13 = NULL;
@@ -672,6 +961,62 @@ main_Image_1_in_46 = NULL;
 main_Image_1_in_47 = NULL;
 main_Image_1_in_48 = NULL;
 main_Image_1_in_49 = NULL;
+main_Shade_3_in_2 = 1;
+main_Shade_3_in_3 = "smooth";
+main_Shade_3_in_4 = 15.0;
+main_Shade_3_in_5 = 60;
+main_Shade_3_in_6 = 1.;
+main_Shade_3_in_7 = 2.0;
+main_Shade_3_in_8 = NULL;
+main_Shade_3_out_1 = NULL;
+main_Image_2_in_1 = "Image_2";
+main_Image_2_in_3 = "X24,,";
+main_Image_2_in_4 = 1;
+main_Image_2_in_5 = [-4.41372e-05 -1.02967e-05 -1.09989e-06];
+main_Image_2_in_6 = [-4.41372e-05 -1.02967e-05 1.10341];
+main_Image_2_in_7 = NULL;
+main_Image_2_in_8 = 946;
+main_Image_2_in_9 = 0.994;
+main_Image_2_in_10 = [0 1 0];
+main_Image_2_in_11 = 30.0;
+main_Image_2_in_12 = 1;
+main_Image_2_in_13 = NULL;
+main_Image_2_in_14 = 1;
+main_Image_2_in_15 = NULL;
+main_Image_2_in_16 = NULL;
+main_Image_2_in_17 = NULL;
+main_Image_2_in_18 = NULL;
+main_Image_2_in_19 = 0;
+main_Image_2_in_20 = NULL;
+main_Image_2_in_21 = NULL;
+main_Image_2_in_22 = "WHITE";
+main_Image_2_in_23 = NULL;
+main_Image_2_in_25 = NULL;
+main_Image_2_in_26 = NULL;
+main_Image_2_in_27 = NULL;
+main_Image_2_in_28 = NULL;
+main_Image_2_in_29 = 0;
+main_Image_2_in_30 = {"kx", "ky", ""};
+main_Image_2_in_31 = NULL;
+main_Image_2_in_32 = {[-0.2 -0.2 0] [0.2 0.2 0]};
+main_Image_2_in_33 = 1;
+main_Image_2_in_34 = NULL;
+main_Image_2_in_35 = NULL;
+main_Image_2_in_36 = NULL;
+main_Image_2_in_37 = {"clear", "grey5", "black", "black"};
+main_Image_2_in_38 = {"background", "grid", "ticks", "labels"};
+main_Image_2_in_39 = NULL;
+main_Image_2_in_40 = NULL;
+main_Image_2_in_41 = "rotate";
+main_Image_2_in_42 = NULL;
+main_Image_2_in_43 = NULL;
+main_Image_2_in_44 = NULL;
+main_Image_2_in_45 = NULL;
+main_Image_2_in_46 = NULL;
+main_Image_2_in_47 = NULL;
+main_Image_2_in_48 = NULL;
+main_Image_2_in_49 = NULL;
+main_Reduce_1_in_2 = { 9.0 };
 Executive("product version 4 4 4");
 $sync
 main();
