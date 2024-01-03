@@ -2,8 +2,8 @@ module parameters
     Implicit None
 !--------to be midified by the usere
     character(len=80):: prefix="BiTeI"
-    real*8,parameter::ef= 4.18903772,kmax=0.07, alpha = 0.77966
-    integer,parameter::meshres=100, nkpoints=(2*meshres+1),nbmin=12,nbmax=13
+    real*8,parameter::kmax=0.07, alpha = 0.77966, ef = 5.5632247424157093
+    integer,parameter::meshres=200, nkpoints=(2*meshres+1),nbmin=12,nbmax=13
     integer nb
     
 end module parameters
@@ -61,7 +61,7 @@ Program Projected_band_structure
 !----- Create K-mesh
     dx = kmax / meshres
     dy = kmax / meshres
-    
+!----- Fermi Energy
 !----- Create header of dx files
     write(100, '(a,2(1x,i8))') 'object 1 class gridpositions counts',nkpoints,nkpoints
     write(100, '(a,2(1x,f12.6))') 'origin',-kmax,-kmax
@@ -84,7 +84,7 @@ Program Projected_band_structure
                 HK=HK+((1-alpha)*(triv_hr(:,:,i))+alpha*(top_hr(:,:,i)))*dcmplx(cos(phase),-sin(phase))/float(ndeg(i))
             enddo
             call zheev('V','U',nb,HK,nb,k_ene,work,lwork,rwork,info)
-            write(100, '(2(1x,f12.6))') k_ene(nbmin), k_ene(nbmax)
+            write(100, '(2(1x,f12.6))') k_ene(nbmin) - ef, k_ene(nbmax) - ef
         enddo
     enddo
     write(100,'(A,/,A,/,A,/,A)') &

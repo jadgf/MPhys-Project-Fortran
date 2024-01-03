@@ -134,6 +134,7 @@
 
 !-----Fermi level:
       ef = (MAXVAL(ene(12, :)) + MINVAL(ene(13, :)))/2.0d0
+      print * , ef
 
 !-----Orbital probability:
 
