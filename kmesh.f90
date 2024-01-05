@@ -3,7 +3,7 @@ module parameters
 !--------to be midified by the usere
     character(len=80):: prefix="BiTeI"
     real*8,parameter::ef= 4.18903772,kmax=0.2,two=2.0d0,sqrt2=sqrt(two)
-    integer,parameter::meshres=100, nkpoints=(2*meshres+1),nbmin=11,nbmax=14
+    integer,parameter::meshres=50, nkpoints=(2*meshres+1),nbmin=13,nbmax=14
     integer nb
 end module parameters
 
@@ -22,7 +22,7 @@ Program Projected_band_structure
     complex*16,allocatable:: Hk(:,:),Hamr(:,:,:),work(:)
     complex*8, parameter:: one = complex(1.d0,0.d0),im = complex(0.d0,1.d0), zero = complex(0.d0,0.d0)
 !------------------------------------------------------
-    write(hamil_file,'(a,a)')trim(adjustl(prefix)),"_hr_trivial.dat"
+    write(hamil_file,'(a,a)')trim(adjustl(prefix)),"_hr_topological.dat"
     write(nnkp,'(a,a)')      trim(adjustl(prefix)),".nnkp"
 
     pi2=4.0d0*atan(1.0d0)*2.0d0
@@ -137,9 +137,9 @@ end program Projected_band_structure
 subroutine projections(H,sam,oam)
     use parameters
     Implicit None
-    complex*16 H(nb,nb),chi(2,1),phi(3)
+    complex*16 H(nb,nb),chi(2,1),phi(3),Y_lm(3,1)
     real*8 sam(3,nbmin:nbmax),oam(3,nbmin:nbmax),sx(1,1),sy(1,1),sz(1,1),lx(1,1),ly(1,1),lz(1,1)
-    complex*8 pauli_x(2, 2), pauli_y(2, 2), pauli_z(2, 2), Lhat_x(3,3), Lhat_y(3,3), Lhat_z(3,3), Y_lm(3,1)
+    complex*8 pauli_x(2, 2), pauli_y(2, 2), pauli_z(2, 2), Lhat_x(3,3), Lhat_y(3,3), Lhat_z(3,3)
     integer ib,jb,orbital_index
 !-----Spin projection
    !-Define Pauli matrices
@@ -167,17 +167,17 @@ subroutine projections(H,sam,oam)
                 sam(3,ib)=sam(3,ib)+sz(1,1)
            
             enddo
-            do jb=1,nb,3
+            do jb=1,7,3
                 phi(1) = H(jb  ,ib) 
                 phi(2) = H(jb+1,ib)
                 phi(3) = H(jb+2,ib)                               
-                Y_lm(3,1) = (-1/sqrt2) * (phi(1) + dcmplx(0,1)*phi(2))
                 Y_lm(1,1) = ( 1/sqrt2) * (phi(1) - dcmplx(0,1)*phi(2))
                 Y_lm(2,1) = phi(3)
+                Y_lm(3,1) = -( 1/sqrt2) * (phi(1) + dcmplx(0,1)*phi(2))
                 
                 lx = matmul(conjg(transpose(Y_lm)),matmul((1/sqrt2)*Lhat_x, Y_lm))
                 ly = matmul(conjg(transpose(Y_lm)),matmul((1/sqrt2)*Lhat_y, Y_lm))
-                lz = matmul(conjg(transpose(Y_lm)),matmul(Lhat_z, Y_lm))
+                lz = matmul(conjg(transpose(Y_lm)),matmul(          Lhat_z, Y_lm))
                 oam(1,ib)=oam(1,ib)+lx(1,1)
                 oam(2,ib)=oam(2,ib)+ly(1,1)
                 oam(3,ib)=oam(3,ib)+lz(1,1)
