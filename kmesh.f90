@@ -13,11 +13,11 @@ Program Projected_band_structure
 !------------------------------------------------------
     real*8 dx, dy
     character(len=80) hamil_file,nnkp,line
-    integer*4 i,j,k,nr,i1,i2,lwork,info,ikx,iky
+    integer*4 i,j,k,nr,i1,i2,lwork,info,ikx,iky,count
     real*8,parameter::third=1d0/3d0
-    real*8 phase,pi2,a,b
+    real*8 phase,pi2,a,b,max_z1,max_z2,min_z1,min_z2
     real*8 avec(3,3),bvec(3,3),rvec(3),kpoint(3)
-    real*8,allocatable:: rvec_data(:,:),ene(:),rwork(:),k_ene(:),kpoints(:,:), sam(:,:), oam(:,:)
+    real*8,allocatable:: rvec_data(:,:),ene(:),rwork(:),k_ene(:),kpoints(:,:), sam(:,:), oam(:,:),sam_z(:,:)
     integer*4,allocatable:: ndeg(:)
     complex*16,allocatable:: Hk(:,:),Hamr(:,:,:),work(:)
     complex*8, parameter:: one = complex(1.d0,0.d0),im = complex(0.d0,1.d0), zero = complex(0.d0,0.d0)
@@ -87,11 +87,11 @@ Program Projected_band_structure
 
                             
 !----- Perform Fourier transform
-    allocate(sam(3,nbmin:nbmax), oam(3,nbmin:nbmax), k_ene(nb))
+    allocate(sam(3,nbmin:nbmax), oam(3,nbmin:nbmax), k_ene(nb), sam_z(2,nkpoints*nkpoints))
                            
     dx = kmax / meshres
     dy = kmax / meshres
-                           
+    count = 1
     do ikx=-meshres,meshres
         do iky=-meshres,meshres
             kpoint(1)= ikx*dx
@@ -112,8 +112,18 @@ Program Projected_band_structure
             write(100, '(2(1x,f12.6))') k_ene(nbmin), k_ene(nbmax)
             write(200, '(6(1x,f12.6))') sam(:,nbmin), sam(:,nbmax)
             write(300, '(6(1x,f12.6))') oam(:,nbmin), oam(:,nbmax)
+			sam_z(1,count) = sam(3,nbmin)
+			sam_z(2,count) = sam(3,nbmax)
+			count = count +1
         enddo
     enddo
+    
+    max_z1 = MAXVAL(sam_z(1,:))
+	max_z2 = MAXVAL(sam_z(2,:))
+	min_z1 = MINVAL(sam_z(1,:))
+	min_z2 = MINVAL(sam_z(2,:))
+    print *, nbmin," has: ", max_z1, min_z1
+	print *, nbmax," has: ", max_z2, min_z2
     write(100,'(A,/,A,/,A,/,A)') &
     'object "regular positions regular connections" class field', &
     'component "positions" value 1', &
